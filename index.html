@@ -1,0 +1,1046 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jake's Say What?!</title><style>
+
+:root{font-family:Arial,sans-serif;color:#17221c;background:#f3f1e8}
+*{box-sizing:border-box} body{margin:0;padding:24px}
+.wrap{max-width:920px;margin:auto}.card{background:white;border:1px solid #d6d3ca;border-radius:16px;padding:26px;box-shadow:0 8px 24px #00000012}
+.center{text-align:center}.hidden{display:none!important}h1{font-size:42px;margin:6px 0}.tag{font-size:20px;font-weight:800}.label{font-size:12px;font-weight:800;letter-spacing:.14em;color:#666}
+.input{width:min(360px,100%);font-size:20px;padding:13px;border:1px solid #aaa;border-radius:9px}.btn{font-size:16px;font-weight:800;padding:13px 22px;border:0;border-radius:9px;cursor:pointer;background:#1769e0;color:white}.space{margin-top:16px}.error{color:#b00020;margin-top:10px}
+.top{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:16px}.bank,.money{font-size:40px;font-weight:900}.money{transition:.15s}.money.drop{color:#d92c2c;transform:scale(1.2)}
+.board{background:#123d2c;border:8px solid #263238;padding:36px 24px;border-radius:14px;min-height:250px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:22px}
+.word{display:inline-flex;gap:8px;white-space:nowrap}.tile{width:50px;height:66px;background:#f7f5ea;border:2px solid #d4d0c2;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
+.prompt{margin-top:15px;padding:15px;text-align:center;background:white;border:1px solid #d6d3ca;border-radius:10px}.pulse{font-size:20px;font-weight:900}
+.alphabet{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.alphabet-row{display:flex;justify-content:center;gap:6px;flex-wrap:nowrap}.key{min-width:31px;height:31px;border:1px solid #bbb;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer;user-select:none}.key:hover{background:#eef4ff;border-color:#1769e0}
+.statusrow{display:flex;justify-content:space-between;gap:15px;margin-top:12px}.timers{margin-top:10px;text-align:center;font-size:18px;font-weight:900}.timers span{display:inline-block;margin:0 10px}.solve{margin-top:16px}.solve form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.muted{color:#666}.result{margin-top:16px}
+@media(max-width:600px){h1{font-size:32px}.tile{width:27px;height:39px;font-size:18px}.word{gap:3px}.board{gap:10px}}
+
+/* Light birthday/game-show backdrop */
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(255,255,255,.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 88% 22%, rgba(255,255,255,.60) 0 3px, transparent 4px),
+    radial-gradient(circle at 18% 82%, rgba(255,255,255,.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 78%, rgba(255,255,255,.50) 0 2px, transparent 3px),
+    linear-gradient(135deg, #eaf7ff 0%, #d7efff 38%, #c8e8fb 68%, #b9ddf5 100%);
+  background-attachment:fixed;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 10%, rgba(255,255,255,.55), transparent 22%),
+    radial-gradient(circle at 78% 18%, rgba(255,255,255,.40), transparent 20%),
+    radial-gradient(circle at 50% 100%, rgba(77,166,219,.10), transparent 30%);
+  z-index:-1;
+}
+.wrap{position:relative;z-index:1;}
+.card{
+  box-shadow:0 14px 36px rgba(0,0,0,.14);
+}
+
+#fireworksCanvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:900;
+}
+
+.key.disabled-letter{
+  opacity:.28;
+  cursor:not-allowed;
+  filter:grayscale(1);
+}
+#wheelControls.hidden{display:none !important}
+#wheelControls .btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
+
+    /* Letter board: keep available letters high-contrast and easy to read. */
+    #alphabet button:not(:disabled) { color:#000 !important; }
+
+.game{max-width:1000px;margin:auto;text-align:center}.title{font-size:44px;font-weight:1000;margin:4px 0}
+.subtitle{font-size:19px;font-weight:850;margin-bottom:22px;opacity:.82}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:20px;margin:8px 0 25px}
+.left{text-align:left}.right{text-align:right}.money{font-size:34px;font-weight:1000}
+.round{display:inline-block;background:#fff;border:2px solid #123d2c;border-radius:10px;padding:9px 16px;font-weight:1000}
+.phase{font-size:22px;font-weight:1000;margin:10px 0 5px}.instruction{font-size:17px;font-weight:750;min-height:48px;margin-bottom:15px}
+.boxes{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px auto;max-width:900px}
+.wordbox{height:135px;border:3px solid #123d2c;border-radius:14px;background:#fff;box-shadow:0 5px 0 #123d2c;color:#123d2c;display:flex;align-items:center;justify-content:center;font-size:50px;font-weight:1000;cursor:pointer;position:relative}
+.wordbox:hover{transform:translateY(-2px)}
+.wordbox.dragging{opacity:.35;transform:scale(.96)}
+.wordbox.dragover{outline:5px dashed #d5aa22;outline-offset:3px}
+.wordbox[draggable="true"]{cursor:grab}
+.wordbox[draggable="true"]:active{cursor:grabbing}
+.wordbox.flash1{background:#ff3b30;color:#260000;border-color:#ff3b30;box-shadow:0 5px 0 #b00000}
+.wordbox.flash2{background:#ff9500;color:#2b1600;border-color:#ff9500;box-shadow:0 5px 0 #b85f00}
+.wordbox.flash3{background:#bf5af2;color:#250033;border-color:#bf5af2;box-shadow:0 5px 0 #7a1fa2}
+.wordbox.flash4{background:#0a84ff;color:#001d36;border-color:#0a84ff;box-shadow:0 5px 0 #0058ad}
+.wordbox.flash5{background:#ffd60a;color:#332a00;border-color:#ffd60a;box-shadow:0 5px 0 #b89500}.wordbox.heard{background:#f8f5eb}.wordbox.selected{outline:5px solid #d5aa22;transform:translateY(-3px)}
+.wordbox .tiny{position:absolute;bottom:8px;font-size:11px;letter-spacing:1px;opacity:.6}
+.answer{min-height:58px;margin:15px auto 10px;font-size:24px;font-weight:1000}
+.seq{display:inline-block;padding:10px 16px;border-radius:10px;background:#f4f0e6;min-width:260px}
+.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-height:0;font-size:23px;font-weight:1000;margin:12px 0 2px}
+.good{color:#16733a}.bad{color:#a52121}.mock{font-size:13px;opacity:.65;margin-top:24px}
+.hidden{display:none!important}
+
+.wordbox.shuffle-flash{transition:background-color .08s linear,border-color .08s linear;transform:none !important}
+.wordbox.playback-flicker{background:#fff !important;border-color:#fff !important;box-shadow:0 5px 0 #d8d8d8 !important;color:#123d2c !important}
+@media(max-width:760px){.boxes{grid-template-columns:repeat(5,1fr);gap:7px}.wordbox{height:95px;font-size:36px}.title{font-size:34px}}
+
+.timer{font-size:1.35rem;font-weight:900;letter-spacing:.08em;margin-top:8px}
+.timer.danger{font-size:1.6rem}
+
+
+/* Upside-down party-cup game pieces */
+#boxes{align-items:flex-end;gap:24px}
+.wordbox{
+  width:116px !important;
+  height:122px !important;
+  min-width:116px !important;
+  border:0 !important;
+  border-radius:10px 10px 22px 22px !important;
+  clip-path:polygon(22% 0,78% 0,94% 88%,100% 91%,100% 100%,0 100%,0 91%,6% 88%);
+  box-shadow:inset 10px 0 12px rgba(255,255,255,.16),
+             inset -10px 0 12px rgba(0,0,0,.13),
+             inset 0 8px 0 rgba(255,255,255,.25),
+             0 9px 0 rgba(0,0,0,.18) !important;
+  color:transparent !important;
+  font-size:0 !important;
+  position:relative;
+  overflow:visible;
+}
+.wordbox::before{
+  content:"";
+  position:absolute;
+  left:1%;
+  right:1%;
+  bottom:3px;
+  height:15px;
+  border-radius:50%;
+  border-top:5px solid rgba(255,255,255,.48);
+  border-bottom:5px solid rgba(0,0,0,.20);
+  background:rgba(255,255,255,.08);
+}
+.wordbox::after{
+  content:"";
+  position:absolute;
+  left:26%;
+  top:10px;
+  width:13%;
+  height:68%;
+  border-radius:999px;
+  background:linear-gradient(to bottom,rgba(255,255,255,.48),rgba(255,255,255,.08));
+  transform:skewX(-7deg);
+}
+.wordbox .tiny{
+  color:rgba(0,0,0,.74) !important;
+  font-size:11px !important;
+  font-weight:900;
+  position:absolute;
+  left:0;right:0;bottom:25px;
+  z-index:3;
+  pointer-events:none;
+}
+.wordbox[data-i="0"]{background:#ff3b30 !important}
+.wordbox[data-i="1"]{background:#ff9500 !important}
+.wordbox[data-i="2"]{background:#bf5af2 !important}
+.wordbox[data-i="3"]{background:#0a84ff !important}
+.wordbox[data-i="4"]{background:#ffd60a !important}
+
+/* Large centered primary game buttons */
+#submit,#next{
+  display:block;
+  width:min(360px,82%);
+  min-height:76px;
+  margin:28px auto 0 !important;
+  padding:18px 28px !important;
+  font-size:25px !important;
+  font-weight:900 !important;
+  border-radius:18px !important;
+  text-align:center;
+}
+#submit.hidden,#next.hidden{display:none !important}
+
+#submit{margin:14px auto 0 !important;}
+
+.wordbox.dragover{
+  outline:5px dashed rgba(255,255,255,.92) !important;
+  outline-offset:5px !important;
+}
+
+
+/* Square game pieces — tight spacing makes drag targets easier to cross */
+#boxes{
+  gap:8px !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.wordbox{
+  width:112px !important;
+  height:112px !important;
+  min-width:112px !important;
+  border-radius:12px !important;
+  clip-path:none !important;
+  border:4px solid rgba(255,255,255,.72) !important;
+  box-shadow:inset 0 5px 0 rgba(255,255,255,.22),
+             inset 0 -6px 0 rgba(0,0,0,.12),
+             0 6px 0 rgba(0,0,0,.18) !important;
+}
+.wordbox::before,
+.wordbox::after{
+  display:none !important;
+  content:none !important;
+}
+.wordbox .tiny{
+  bottom:12px !important;
+}
+
+
+/* Tighter square spacing */
+#boxes{gap:2px !important}
+
+
+/* Blocks nearly touching for easier drag insertion */
+#boxes{gap:0 !important}
+.wordbox{margin-left:-2px !important;margin-right:-2px !important}
+
+
+/* HOW TO PLAY / mode selection */
+.tutorial-overlay{position:fixed;inset:0;z-index:1000;background:rgba(8,12,24,.96);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+.tutorial-card{width:min(760px,96vw);background:#fff;color:#111;border-radius:24px;padding:30px 34px 32px;box-shadow:0 20px 70px rgba(0,0,0,.4);text-align:left}
+.tutorial-title{text-align:center;font-size:36px;font-weight:1000;letter-spacing:.5px;margin-bottom:18px}
+.instructions{font-size:20px;line-height:1.48;font-weight:700}
+.instructions p{margin:0 0 14px}.instructions strong{font-weight:1000}
+.mode-choices{display:flex;gap:16px;justify-content:center;margin-top:25px;flex-wrap:wrap}
+.mode-btn{width:min(310px,100%);min-height:82px;border:0;border-radius:18px;color:#fff;font-size:22px;font-weight:1000;padding:14px 18px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+.mode-btn small{display:block;font-size:13px;line-height:1.25;margin-top:5px;font-weight:800}.practice-btn{background:#0a84ff}.real-btn{background:#20a34a}
+.mode-indicator{text-align:center;font-size:18px;font-weight:1000;margin:8px 0 2px;letter-spacing:.5px}.practice-mode{color:#0a84ff}.real-mode{color:#20a34a}
+#switchReal{display:none;width:min(360px,82%);min-height:58px;margin:10px auto 0;border:0;border-radius:16px;background:#20a34a;color:white;font-size:20px;font-weight:1000;cursor:pointer}
+@media(max-width:600px){.tutorial-card{padding:22px 18px}.tutorial-title{font-size:29px}.instructions{font-size:17px}}
+
+#next small{display:block;font-size:12px;line-height:1.1;font-weight:600;letter-spacing:.02em;text-transform:none}
+#next span{display:block;font-size:20px;line-height:1.3;font-weight:900}
+#backInstructions{width:min(360px,82%);min-height:50px;margin:10px auto 0;border:0;border-radius:14px;background:#475569;color:white;font-size:17px;font-weight:800;cursor:pointer}
+</style><style>
+/* Five abutting squares spanning the full game row */
+#boxes{
+  display:grid !important;
+  grid-template-columns:repeat(5,1fr) !important;
+  gap:0 !important;
+  width:100% !important;
+  max-width:none !important;
+  margin:22px 0 !important;
+  padding:0 !important;
+}
+.wordbox{
+  width:100% !important;
+  min-width:0 !important;
+  height:auto !important;
+  aspect-ratio:1 / 1 !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  box-sizing:border-box !important;
+}
+.wordbox:first-child{border-radius:12px 0 0 12px !important;}
+.wordbox:last-child{border-radius:0 12px 12px 0 !important;}
+.wordbox.revealed{
+  color:#111 !important;
+  font-size:clamp(17px,2.15vw,28px) !important;
+  line-height:1.05 !important;
+  text-align:center !important;
+  padding:10px !important;
+  overflow-wrap:anywhere !important;
+}
+
+.wordbox.slow-solve{
+  transition:transform 1.8s cubic-bezier(.22,.61,.36,1) !important;
+  position:relative;
+  z-index:3;
+}
+
+/* Shows the exact GAP where the dragged square will be inserted on release. */
+#boxes{position:relative !important;}
+.placement-line{
+  position:absolute;top:-7px;bottom:-7px;width:8px;
+  transform:translateX(-50%);border-radius:999px;background:#fff;
+  box-shadow:0 0 0 2px rgba(0,0,0,.22),0 0 16px rgba(255,255,255,1);
+  pointer-events:none;z-index:50;
+  animation:placementPulse .5s ease-in-out infinite alternate;
+}
+@keyframes placementPulse{from{opacity:.42;transform:translateX(-50%) scaleY(.84)}to{opacity:1;transform:translateX(-50%) scaleY(1)}}
+
+/* While dragging is allowed, every square shows a permanent vertical guide.
+   The flashing placement line still marks the exact insertion gap on release. */
+.wordbox.drag-enabled{position:relative;}
+.wordbox.drag-enabled::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:12%;
+  bottom:12%;
+  width:3px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  box-shadow:0 0 0 1px rgba(0,0,0,.18);
+  pointer-events:none;
+  z-index:6;
+}
+
+/* Permanent action/message deck: button and feedback never change position */
+.fixed-control-area{
+  width:100%;
+  margin-top:12px;
+}
+.fixed-button-slot{
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:12px;
+  width:min(620px,96%);
+  min-height:76px;
+  margin:0 auto;
+}
+.fixed-button-slot #submit,
+.fixed-button-slot #next{
+  position:static !important;
+  inset:auto !important;
+  flex:1 1 0;
+  width:auto !important;
+  height:76px !important;
+  min-height:76px !important;
+  margin:0 !important;
+}
+.fixed-message-slot{
+  box-sizing:border-box;
+  min-height:66px !important;
+  margin:10px auto 0 !important;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  text-align:center;
+  width:100%;
+}
+
+/* Real-money game-show transition */
+#realTransition{
+  position:fixed; inset:0; z-index:10000;
+  display:none; align-items:center; justify-content:center;
+  background:#07111f; color:white;
+}
+#realTransition.show{display:flex}
+#realTransitionWord{
+  max-width:92vw; padding:24px; text-align:center;
+  font-size:clamp(42px,7vw,86px); line-height:1.05;
+  font-weight:1000; letter-spacing:2px;
+  opacity:0; transform:scale(.9);
+}
+#realTransitionWord.flash{animation:realWordFlash .32s ease-out forwards}
+@keyframes realWordFlash{
+  from{opacity:0;transform:scale(.86)}
+  to{opacity:1;transform:scale(1)}
+}
+</style>
+</head><body>
+
+<div id="realTransition" aria-live="polite" aria-atomic="true">
+ <div id="realTransitionWord"></div>
+</div>
+<div id="realLogin" class="tutorial-overlay" style="display:none;z-index:1100">
+ <div class="tutorial-card" style="max-width:540px;text-align:center">
+  <div class="tutorial-title">REAL MONEY ENTRY</div>
+  <p>Enter your first name and password to play for birthday money.</p>
+  <form id="realLoginForm" style="display:flex;flex-direction:column;gap:12px;align-items:center">
+   <input id="realPlayerName" type="text" autocomplete="given-name" maxlength="40" required placeholder="First name" aria-label="First name" style="width:min(320px,100%);padding:14px;font-size:20px;border-radius:10px;border:2px solid #aaa;text-align:center">
+   <input id="realPlayerPassword" type="password" autocomplete="off" required placeholder="Password" aria-label="Password" style="width:min(320px,100%);padding:14px;font-size:20px;border-radius:10px;border:2px solid #aaa;text-align:center">
+   <p id="realLoginError" role="alert" style="color:#b42318;margin:0;min-height:1.4em"></p>
+   <button type="submit" class="mode-btn real-btn" style="min-height:58px">START REAL MONEY</button>
+   <button id="cancelRealLogin" type="button" class="mode-btn practice-btn" style="min-height:52px">CANCEL</button>
+  </form>
+ </div>
+</div>
+<div id="tutorial" class="tutorial-overlay">
+ <div class="tutorial-card">
+  <div class="tutorial-title">HOW TO PLAY</div>
+  <div class="instructions">
+   <p>Each colored box represents <strong>a word or a few words</strong>.</p>
+   <p>When you press <strong>SUBMIT</strong>, you will hear the words in the order the boxes are currently arranged.</p>
+   <p>The words make a familiar phrase — <strong>but they start out jumbled!</strong></p>
+   <p><strong>Drag the colored boxes left or right</strong> until you think the words are in the correct order. Press <strong>SUBMIT</strong> again to hear your new arrangement. You can keep rearranging the boxes and trying again.</p>
+   <p>There is no time limit for an individual phrase. Use <strong>NEXT PUZZLE</strong> to reveal the correct order, then automatically advance after 5 seconds. In Real Money Mode, the five-second reveal does not cost game time.</p>
+   <p>In Real Money Mode, you have <strong>30 minutes total</strong> to solve as many phrases as possible. Each correct phrase earns <strong>$2.50</strong>. Real Money Mode ends at <strong>$50.00</strong>, <strong>20 puzzles</strong>, or <strong>30 minutes</strong>, whichever comes first.</p>
+  </div>
+  <div class="mode-choices">
+   <button id="practiceMode" type="button" class="mode-btn practice-btn">PRACTICE MODE<small>Try as many real puzzles as you want. No money is won or lost.</small></button>
+   <button id="realMode" type="button" class="mode-btn real-btn">PLAY FOR REAL MONEY<small>Start the Birthday Challenge and play for actual birthday money!</small></button>
+  </div>
+ </div>
+</div>
+<div class="wrap"><div class="card game">
+<div style="font-size:34px">🎂 🔊 🧠 🎉</div>
+<div class="title">JAKE'S SAY WHAT?!</div>
+<div class="subtitle">LISTEN. REMEMBER. PUT THE PHRASE IN ORDER.</div>
+<div id="modeIndicator" class="mode-indicator"></div>
+
+<div class="top">
+ <div class="left"><div class="label">BIRTHDAY BANK</div><div id="bank" class="money">$0.00</div></div>
+ <div><div class="round">ROUND <span id="round">1</span> OF <span id="total">5</span></div></div>
+ <div class="right"><div class="label">ROUND VALUE</div><div id="value" class="money">$2.50</div></div>
+</div>
+
+<div id="phase" class="phase">LISTENING ROUND</div>
+<div id="sessionTimer" class="timer hidden" style="color:#16803b">REAL MONEY TIME LEFT: 30:00</div>
+
+<div id="instruction" class="instruction">Drag the mystery squares into phrase order. The words will NOT appear on the screen.</div>
+<div id="boxes" class="boxes"></div>
+
+<div id="answerArea" class="hidden">
+ <div class="label">ORDER THE SQUARES TO FORM A PHRASE</div>
+</div>
+
+<div class="fixed-control-area">
+ <div class="fixed-button-slot">
+  <button id="submit" class="hidden">SUBMIT</button>
+  <button id="next" class="hidden"><small>quit this puzzle</small><span>NEXT PUZZLE</span></button>
+ </div>
+ <div id="feedback" class="feedback fixed-message-slot"></div>
+ <button id="backInstructions" type="button" style="display:none">RETURN TO INSTRUCTIONS</button>
+ <button id="switchReal">PLAY FOR REAL MONEY</button>
+</div>
+<div class="mock">Practice is unlimited. Real Money entry and final results are verified with Google Sheets.</div>
+</div></div>
+
+<script>
+const puzzles=[
+ {parts:["STEP","SMALL","ONE","MAN","FOR"], answer:[2,1,0,4,3], phrase:"ONE SMALL STEP FOR MAN"},
+ {parts:["THE WORM","EARLY","THE","GETS","BIRD"], answer:[2,1,4,3,0], phrase:"THE EARLY BIRD GETS THE WORM"},
+ {parts:["YOU","FORCE","WITH","THE","BE"], answer:[3,1,4,2,0], phrase:"THE FORCE BE WITH YOU"},
+ {parts:["GOLD","GLITTERS","ALL","NOT","THAT"], answer:[3,2,4,1,0], phrase:"NOT ALL THAT GLITTERS GOLD"},
+ {parts:["A DAY","THE DOCTOR","AN APPLE","KEEPS","AWAY"], answer:[2,0,3,1,4], phrase:"AN APPLE A DAY KEEPS THE DOCTOR AWAY"}
+];
+let p=0,heardOrder=[],choice=[],phase="listen",bank=0;
+const REAL_PUZZLE_LIMIT=20,REAL_BANK_LIMIT=50,REAL_PUZZLE_VALUE=2.50;
+let realPuzzlesStarted=0;
+// Use the existing Google Apps Script web app; the Say What?! handlers must be deployed there.
+const SAY_WHAT_SCRIPT_URL='https://script.google.com/macros/s/AKfycbydAoei5qLaRW58kzW3fTY_JAd1hnqJa3cIwfQ4GCJjk5og4gM6nM4zZ4m1nH_bzlSNPQ/exec';
+let sayWhatToken=null, sayWhatFinishing=false;
+function sayWhatRequest(params){
+ return new Promise((resolve,reject)=>{
+  const callback='sayWhatCallback_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const script=document.createElement('script');
+  let done=false;
+  const cleanup=()=>{delete window[callback];script.remove();clearTimeout(timeout);};
+  const timeout=setTimeout(()=>{if(done)return;done=true;cleanup();reject(new Error('Spreadsheet verification timed out.'));},15000);
+  window[callback]=result=>{if(done)return;done=true;cleanup();resolve(result);};
+  script.onerror=()=>{if(done)return;done=true;cleanup();reject(new Error('Cannot reach the spreadsheet.'));};
+  const query=new URLSearchParams({...params,callback});
+  script.src=SAY_WHAT_SCRIPT_URL+'?'+query.toString();
+  document.head.appendChild(script);
+ });
+}
+async function saveSayWhatResult(reason){
+ if(!sayWhatToken||sayWhatFinishing)return;
+ sayWhatFinishing=true;
+ try{const result=await sayWhatRequest({action:'sayWhatFinish',token:sayWhatToken,amount:bank.toFixed(2),puzzles:realPuzzlesStarted,reason});
+  if(!result.ok)throw new Error(result.error||'Spreadsheet declined the result');
+ }catch(error){console.error('Unable to record Say What?! result:',error);
+  document.querySelector('#feedback').textContent+=' — Could not confirm spreadsheet recording. Contact the game administrator.';
+ }finally{sayWhatFinishing=false;}
+}
+
+let gameMode=null; // "practice" or "real"
+let dragOrder=[0,1,2,3,4],submitting=false,timerStarted=false;
+// Gap-based drag model: the mouse selects one of the five insertion gaps
+// among the OTHER four squares. A flashing vertical line shows the exact
+// gap that will receive the dragged square on release.
+let activeDragIdentity=null,pendingDropPos=null;
+let timeLeft=60,timerId=null;
+const REAL_SESSION_SECONDS=30*60;
+let realSessionRemaining=REAL_SESSION_SECONDS,realSessionInterval=null,realSessionEnded=false;
+function updateRealSessionDisplay(){
+ const el=document.querySelector('#sessionTimer');
+ el.classList.toggle('hidden',gameMode!=='real');
+ const m=Math.floor(realSessionRemaining/60),sec=realSessionRemaining%60;
+ el.textContent='REAL MONEY TIME LEFT: '+m+':'+String(sec).padStart(2,'0');
+ el.style.color=realSessionRemaining<=60?'#c22':'#16803b';
+}
+function endRealSession(reason="30 MINUTES COMPLETE"){
+ if(realSessionEnded)return;
+ realSessionEnded=true;
+ if(gameMode==='real')void saveSayWhatResult(reason);
+ clearInterval(realSessionInterval);realSessionInterval=null;
+ stopTimer();timerStarted=false;submitting=false;phase='sessionEnded';
+ if('speechSynthesis' in window)window.speechSynthesis.cancel();
+ document.querySelector('#submit').classList.add('hidden');
+ document.querySelector('#next').classList.add('hidden');
+ document.querySelector('#switchReal').style.display='none';
+ document.querySelector('#feedback').className='feedback good';
+ document.querySelector('#feedback').textContent=reason+' — FINAL BIRTHDAY BANK: $'+bank.toFixed(2);
+ updateRealSessionDisplay();
+}
+function beginRealSessionClock(){
+ clearInterval(realSessionInterval);
+ realSessionRemaining=REAL_SESSION_SECONDS;realSessionEnded=false;
+ updateRealSessionDisplay();
+ realSessionInterval=setInterval(()=>{
+  if(gameMode!=='real'||realSessionEnded)return;
+  realSessionRemaining=Math.max(0,realSessionRemaining-1);
+  updateRealSessionDisplay();
+  if(realSessionRemaining===0)endRealSession();
+ },1000);
+}
+
+let firstRealSubmission=true;
+const $=s=>document.querySelector(s);
+let preferredVoice=null;
+function choosePreferredVoice(){
+ if(!("speechSynthesis" in window))return null;
+ const voices=window.speechSynthesis.getVoices();
+ if(!voices.length)return null;
+ const english=voices.filter(v=>/^en[-_]/i.test(v.lang||""));
+ const preferences=[
+   /Microsoft.*(Aria|Jenny|Guy|Andrew|Brian|Emma|Ava).*Natural/i,
+   /(Aria|Jenny|Guy|Andrew|Brian|Emma|Ava).*Natural/i,
+   /Microsoft.*(Aria|Jenny|Guy|Andrew|Brian|Emma|Ava)/i,
+   /Google US English/i,
+   /Samantha/i,
+   /Microsoft.*English/i
+ ];
+ for(const re of preferences){
+   const v=english.find(x=>re.test(x.name));
+   if(v){preferredVoice=v;return v;}
+ }
+ preferredVoice=english.find(v=>/en-US/i.test(v.lang||"")) || english[0] || voices[0];
+ return preferredVoice;
+}
+choosePreferredVoice();
+if("speechSynthesis" in window){
+ window.speechSynthesis.onvoiceschanged=choosePreferredVoice;
+}
+function makeUtterance(t,rate){
+ const u=new SpeechSynthesisUtterance(t);
+ const v=preferredVoice || choosePreferredVoice();
+ if(v){u.voice=v;u.lang=v.lang;} else {u.lang="en-US";}
+ u.rate=rate;u.pitch=1;u.volume=1;
+ return u;
+}
+function speak(t){
+ if(!("speechSynthesis" in window))return;
+ speechSynthesis.cancel();
+ const u=makeUtterance(t,0.78);
+ speechSynthesis.speak(u);
+}
+function successSound(){
+ try{
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)return;
+   const ctx=new AC();
+   const notes=[523.25,659.25,783.99,1046.5];
+   notes.forEach((freq,n)=>{
+     const o=ctx.createOscillator(),g=ctx.createGain();
+     o.type="triangle";o.frequency.value=freq;
+     o.connect(g);g.connect(ctx.destination);
+     const t=ctx.currentTime+n*.13;
+     g.gain.setValueAtTime(.0001,t);
+     g.gain.exponentialRampToValueAtTime(.18,t+.02);
+     g.gain.exponentialRampToValueAtTime(.0001,t+.22);
+     o.start(t);o.stop(t+.24);
+   });
+ }catch(e){}
+}
+function sadSound(){
+ try{
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)return;
+   const ctx=new AC();
+   const notes=[392,349.23,293.66,220];
+   notes.forEach((freq,n)=>{
+     const o=ctx.createOscillator(),g=ctx.createGain();
+     o.type="triangle";o.frequency.value=freq;
+     o.connect(g);g.connect(ctx.destination);
+     const t=ctx.currentTime+n*.16;
+     g.gain.setValueAtTime(.0001,t);
+     g.gain.exponentialRampToValueAtTime(.15,t+.02);
+     g.gain.exponentialRampToValueAtTime(.0001,t+.27);
+     o.start(t);o.stop(t+.29);
+   });
+ }catch(e){}
+}
+function clearPlacementLine(){
+ document.querySelectorAll(".placement-line").forEach(el=>el.remove());
+}
+function showPlacementLine(gapIndex,remainingBlocks){
+ clearPlacementLine();
+ const board=$("#boxes");
+ if(!board||remainingBlocks.length!==4)return;
+ const boardRect=board.getBoundingClientRect();
+ let x;
+ if(gapIndex===0){
+   x=remainingBlocks[0].getBoundingClientRect().left-boardRect.left;
+ }else if(gapIndex===remainingBlocks.length){
+   x=remainingBlocks[remainingBlocks.length-1].getBoundingClientRect().right-boardRect.left;
+ }else{
+   const leftRect=remainingBlocks[gapIndex-1].getBoundingClientRect();
+   const rightRect=remainingBlocks[gapIndex].getBoundingClientRect();
+   x=((leftRect.right+rightRect.left)/2)-boardRect.left;
+ }
+ const line=document.createElement("div");
+ line.className="placement-line";
+ line.style.left=x+"px";
+ board.appendChild(line);
+}
+function updatePendingDrop(clientX){
+ if(activeDragIdentity===null)return;
+ const allBlocks=[...document.querySelectorAll("#boxes .wordbox")];
+ const remainingBlocks=allBlocks.filter(el=>Number(el.dataset.i)!==activeDragIdentity);
+ if(remainingBlocks.length!==4)return;
+ const centers=remainingBlocks.map(el=>{
+   const r=el.getBoundingClientRect();
+   return r.left+r.width/2;
+ });
+ // Five insertion gaps: before the first remaining square, between each pair,
+ // and after the last. Crossing a square's center advances to the next gap.
+ let gap=0;
+ while(gap<centers.length && clientX>centers[gap])gap++;
+ pendingDropPos=gap;
+ showPlacementLine(gap,remainingBlocks);
+}
+function installBoardDropHandlers(){
+ const board=$("#boxes");
+ board.ondragover=e=>{
+   if(activeDragIdentity===null||submitting)return;
+   e.preventDefault();
+   if(e.dataTransfer)e.dataTransfer.dropEffect="move";
+   updatePendingDrop(e.clientX);
+ };
+ board.ondrop=e=>{
+   if(activeDragIdentity===null||submitting)return;
+   e.preventDefault();
+   updatePendingDrop(e.clientX);
+   const from=activeDragIdentity,to=pendingDropPos;
+   clearPlacementLine();
+   if(Number.isInteger(to)){
+     const next=dragOrder.filter(x=>x!==from);
+     next.splice(Math.max(0,Math.min(next.length,to)),0,from);
+     dragOrder=next;
+   }
+   activeDragIdentity=null;pendingDropPos=null;
+   render();
+ };
+}
+function render(){
+ const q=puzzles[p]; $("#round").textContent=gameMode==="real"?realPuzzlesStarted:p+1; $("#total").textContent=gameMode==="real"?REAL_PUZZLE_LIMIT:puzzles.length;
+ $("#boxes").innerHTML="";
+ dragOrder.forEach(i=>{
+   const b=document.createElement("div"); b.className="wordbox heard";
+   b.dataset.i=i;
+   b.textContent="";
+   if(phase==="result"){
+     b.classList.add("revealed");
+     b.textContent=q.parts[i];
+   }
+   const tiny=document.createElement("div");tiny.className="tiny";
+   if(phase==="order"){
+     tiny.textContent="DRAG ME";
+     b.draggable=!submitting;
+     if(!submitting)b.classList.add("drag-enabled");
+     b.addEventListener("dragstart",e=>{
+       if(submitting){e.preventDefault();return;}
+       
+       // Dragging is itself the start of the puzzle. Once the player has
+       // moved a square, BEGIN PUZZLE is no longer appropriate.
+       if(firstRealSubmission){
+         firstRealSubmission=false;
+         $("#submit").textContent="SUBMIT ANSWER";
+       }
+       b.classList.add("dragging");
+       e.dataTransfer.effectAllowed="move";
+       e.dataTransfer.setData("text/plain",String(i));
+       activeDragIdentity=i;
+       // Start with the square's current insertion gap among the other four.
+       pendingDropPos=dragOrder.filter(x=>x!==i).findIndex(x=>dragOrder.indexOf(x)>dragOrder.indexOf(i));
+       if(pendingDropPos<0)pendingDropPos=4;
+       updatePendingDrop(e.clientX);
+     });
+     b.addEventListener("dragend",()=>{
+       b.classList.remove("dragging");
+       clearPlacementLine();
+       activeDragIdentity=null;
+       pendingDropPos=null;
+     });
+   }else{
+     tiny.textContent="";
+   }
+   b.appendChild(tiny);
+   $("#boxes").appendChild(b);
+ });
+ installBoardDropHandlers();
+}
+function startOrder(){
+ phase="order";
+ dragOrder=[0,1,2,3,4];
+ submitting=false;
+ timerStarted=false;
+ timeLeft=60;
+ updateTimer();
+ $("#phase").textContent="PUT THE PHRASE IN ORDER";
+ $("#instruction").textContent="Drag the squares into the correct order. Use NEXT PUZZLE to reveal and skip this phrase.";
+ $("#answerArea").classList.remove("hidden");
+ $("#submit").classList.remove("hidden");
+ $("#submit").disabled=false;
+ $("#submit").textContent=firstRealSubmission ? "BEGIN PUZZLE" : "SUBMIT";
+ render();
+}
+function flickerPlaybackSquare(identity){
+ const b=document.querySelector('.wordbox[data-i="'+identity+'"]');
+ if(!b)return;
+ // Two quick white flashes.  This is intentionally visual only; it does not
+ // alter the block order or interrupt the single natural speech utterance.
+ [0,110].forEach(delay=>{
+   setTimeout(()=>b.classList.add("playback-flicker"),delay);
+   setTimeout(()=>b.classList.remove("playback-flicker"),delay+55);
+ });
+}
+function speakSubmittedOrder(done){
+ if(!("speechSynthesis" in window)){setTimeout(done,300);return;}
+ window.speechSynthesis.cancel();
+ // Keep the same single utterance, preferred voice, and 0.72 rate.
+ // Visual cues are timed independently because some browser voices only
+ // report a boundary event for the first spoken chunk.
+ const chunks=dragOrder.map(i=>puzzles[p].parts[i]);
+ // TTS can interpret the all-caps word SAT as the initials S.A.T.
+ // Keep the visual chunk unchanged, but force that exact chunk to spoken lowercase.
+ const spokenChunks=chunks.map(chunk=>chunk.trim().toUpperCase()==="SAT" ? "sat" : chunk);
+ const submitted=spokenChunks.join(". ");
+ const prefix="…  ";
+ const u=makeUtterance(prefix+submitted,0.72);
+ let cueTimers=[];
+ u.onstart=()=>{
+   // Flicker every square in spoken order. Estimate each chunk's speaking
+   // time from its length so the cue advances naturally with the phrase.
+   let elapsed=0;
+   chunks.forEach((chunk,index)=>{
+     cueTimers.push(setTimeout(()=>flickerPlaybackSquare(dragOrder[index]),elapsed));
+     const words=chunk.trim().split(/\s+/).filter(Boolean).length;
+     elapsed += 330 + (chunk.length*58) + (Math.max(0,words-1)*90);
+   });
+ };
+ const finish=()=>{
+   cueTimers.forEach(clearTimeout);
+   cueTimers=[];
+   if(done)done();
+ };
+ u.onend=finish;
+ u.onerror=finish;
+ window.speechSynthesis.speak(u);
+}
+function submitAnswer(){
+ if(realSessionEnded||phase!=="order"||submitting)return;
+ const isBeginPuzzle=firstRealSubmission;
+ if(isBeginPuzzle){
+   firstRealSubmission=false;
+   $("#submit").textContent="SUBMIT";
+ }
+ submitting=true;
+ $("#submit").disabled=true;
+ $("#feedback").className="feedback";
+ $("#feedback").textContent="LISTEN TO THE WORDS…";
+ render();
+ if(isBeginPuzzle){
+   // Listening time never counts against the player. Normally the clock has
+   // not started yet, but explicitly pause it here so BEGIN PUZZLE playback
+   // can never consume timer time.
+   const resumeAfterPlayback=timerId!==null;
+   if(resumeAfterPlayback) pauseTimer();
+   speakSubmittedOrder(()=>{
+     if(phase!=="order")return;
+     submitting=false;
+     $("#feedback").className="feedback";
+     $("#feedback").textContent="REARRANGE THE BOXES TO FORM THE CORRECT PHRASE AND CLICK THE SUBMIT BUTTON.";
+     $("#submit").disabled=false;
+     
+     render();
+   });
+ }else{
+   // SUBMIT ANSWER: pause the countdown for the entire phrase playback,
+   // then evaluate the arrangement. If the answer is wrong, resume afterward.
+   const resumeAfterPlayback=timerId!==null;
+   if(resumeAfterPlayback) pauseTimer();
+   speakSubmittedOrder(()=>{
+     if(phase!=="order")return;
+     checkAttempt();
+     
+   });
+ }
+}
+function checkAttempt(){
+ if(phase!=="order"||realSessionEnded)return;
+ const q=puzzles[p];
+ const ok=dragOrder.every((v,i)=>v===q.answer[i]);
+ if(ok){
+   phase="result";
+   stopTimer();timerStarted=false;
+   $("#submit").classList.add("hidden");
+   $("#feedback").className="feedback good";
+   $("#feedback").textContent="CORRECT";
+   if(gameMode==="real"){bank=Math.min(REAL_BANK_LIMIT,bank+REAL_PUZZLE_VALUE);$("#bank").textContent="$"+bank.toFixed(2);}
+   successSound();
+   if(gameMode==="real"&&(bank>=REAL_BANK_LIMIT||realPuzzlesStarted>=REAL_PUZZLE_LIMIT)){
+     endRealSession(bank>=REAL_BANK_LIMIT?'$50 BANK LIMIT REACHED':'20 PUZZLES COMPLETE');
+     return;
+   }
+   setNextPuzzleLabel();
+   $("#next").classList.remove("hidden");
+   if(gameMode==="practice")$("#switchReal").style.display="block";
+   render();
+ }else{
+   submitting=false;
+   $("#feedback").className="feedback bad";
+   $("#feedback").textContent="NOT QUITE — REARRANGE THE BOXES AND TRY AGAIN.";
+   $("#submit").disabled=false;
+   render();
+ }
+}
+function animateFailedSolution(){
+ const q=puzzles[p];
+ const current=dragOrder.slice();
+ const blocks=[...document.querySelectorAll("#boxes .wordbox")];
+ if(blocks.length!==5){dragOrder=q.answer.slice();render();setNextPuzzleLabel();$("#next").classList.remove("hidden");if(gameMode==="practice")$("#switchReal").style.display="block";return;}
+
+ // The words are already revealed in their CURRENT positions. Slowly slide each
+ // entire block to the slot where that hidden chunk belongs in the solution.
+ const rects=blocks.map(b=>b.getBoundingClientRect());
+ blocks.forEach((b,visualPos)=>{
+   const identity=current[visualPos];
+   const targetPos=q.answer.indexOf(identity);
+   const dx=rects[targetPos].left-rects[visualPos].left;
+   b.classList.add("slow-solve");
+   b.style.transform="translateX("+dx+"px)";
+ });
+
+ setTimeout(()=>{
+   dragOrder=q.answer.slice();
+   render();
+   setNextPuzzleLabel();
+   $("#next").classList.remove("hidden");
+   if(gameMode==="practice")$("#switchReal").style.display="block";
+ },1900);
+}
+function pauseTimer(){
+ if(timerId){clearInterval(timerId);timerId=null;}
+}
+function resumeTimer(){ /* Per-puzzle timer intentionally disabled. */ }
+function timerTick(){
+ timeLeft--;
+ updateTimer();
+ if(timeLeft<=0){
+   stopTimer();timerStarted=false;
+   phase="result";
+   submitting=false;
+   $("#submit").classList.add("hidden");
+   if("speechSynthesis" in window) window.speechSynthesis.cancel();
+   $("#feedback").className="feedback bad";
+   $("#feedback").textContent="OUT OF TIME";
+   sadSound();
+   $("#next").classList.add("hidden");
+   render();
+   requestAnimationFrame(()=>requestAnimationFrame(animateFailedSolution));
+   if(gameMode==='real'&&realPuzzlesStarted>=REAL_PUZZLE_LIMIT){
+     setTimeout(()=>endRealSession('20 PUZZLES COMPLETE'),2200);
+   }
+ }
+}
+function startTimer(){ /* Per-puzzle timer intentionally disabled. */ }
+function updateTimer(){
+ const el=$("#timer");
+ if(!el)return;
+ el.textContent="TIME: "+timeLeft;
+ el.classList.toggle("danger",timeLeft<=10);
+}
+function stopTimer(){
+ if(timerId){clearInterval(timerId);timerId=null;}
+}
+function load(){
+ if(realSessionEnded&&gameMode==='real')return;
+ if(gameMode==='real'){
+   if(realPuzzlesStarted>=REAL_PUZZLE_LIMIT){endRealSession('20 PUZZLES COMPLETE');return;}
+   realPuzzlesStarted++;
+ }
+ stopTimer();
+ if("speechSynthesis" in window) window.speechSynthesis.cancel();
+ heardOrder=[];choice=[];dragOrder=[0,1,2,3,4];submitting=false;timerStarted=false;phase="order";
+ firstRealSubmission=true;
+ timeLeft=60;updateTimer();
+ $("#feedback").className="feedback";$("#feedback").textContent="";
+ $("#next").classList.remove("hidden");
+ setNextPuzzleLabel();
+ $("#next").disabled=false;
+ $("#switchReal").style.display="none";
+ $("#backInstructions").style.display=gameMode==="practice"?"block":"none";
+ $("#modeIndicator").textContent=gameMode==="practice"?"PRACTICE MODE — NO REAL MONEY":"REAL MONEY MODE";
+ $("#modeIndicator").className="mode-indicator "+(gameMode==="practice"?"practice-mode":"real-mode");
+ $("#value").textContent=gameMode==="practice"?"PRACTICE":"$2.50";
+ startOrder();
+}
+$("#submit").onclick=submitAnswer;
+let nextPuzzlePending=false;
+function advancePuzzle(){
+ if(realSessionEnded)return;
+ p=(p+1)%puzzles.length;
+ load();
+ initialShuffle();
+}
+$("#next").onclick=()=>{
+ if(nextPuzzlePending||realSessionEnded)return;
+ // After a solved phrase, NEXT PUZZLE advances directly; while playing it reveals first.
+ if(phase==='result'){
+   if(gameMode==='real'&&realPuzzlesStarted>=REAL_PUZZLE_LIMIT){endRealSession('20 PUZZLES COMPLETE');return;}
+   advancePuzzle();return;
+ }
+ nextPuzzlePending=true;
+ // Give back the five seconds spent displaying the revealed answer.
+ // The overall clock continues ticking, so the reveal is time-neutral.
+ if(gameMode==='real'){
+   realSessionRemaining=Math.min(REAL_SESSION_SECONDS,realSessionRemaining+5);
+   updateRealSessionDisplay();
+ }
+ const nextBtn=$("#next");
+ nextBtn.disabled=true;
+ submitting=true;
+ if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ // Abandon the puzzle without awarding money, and reveal the correct arrangement.
+ phase="result";
+ dragOrder=puzzles[p].answer.slice();
+ $("#feedback").className="feedback";
+ $("#feedback").textContent="CORRECT ORDER — NEXT PUZZLE IN 5 SECONDS";
+ $("#submit").classList.add("hidden");
+ render();
+ setTimeout(()=>{
+   nextPuzzlePending=false;
+   if(realSessionEnded)return;
+   if(gameMode==="real" && realPuzzlesStarted>=REAL_PUZZLE_LIMIT){
+     endRealSession("20 PUZZLES COMPLETE");
+     return;
+   }
+   advancePuzzle();
+ },5000);
+};
+
+function initialShuffle(){
+ const blocks=[...document.querySelectorAll("#boxes .wordbox")];
+ // Always hide any revealed words before the shuffle begins in either mode.
+ blocks.forEach(b=>{ b.textContent=""; b.classList.remove("revealed"); });
+ const palette=["#ff3b30","#ff9500","#bf5af2","#0a84ff","#ffd60a"];
+ let frame=0;
+ const frames=10;
+ const shuffleTimer=setInterval(()=>{
+   blocks.forEach((b,i)=>{
+     const c=palette[(i+frame)%palette.length];
+     b.classList.add("shuffle-flash");
+     b.style.setProperty("background",c,"important");
+     b.style.setProperty("border-color",c,"important");
+   });
+   frame++;
+   if(frame>=frames){
+     clearInterval(shuffleTimer);
+     blocks.forEach(b=>{
+       b.classList.remove("shuffle-flash");
+       b.style.removeProperty("background");
+       b.style.removeProperty("border-color");
+     });
+   }
+ },85);
+}
+
+let realLoginReturnToPractice=false;
+function openRealLogin(){
+ realLoginReturnToPractice=gameMode==='practice' && document.getElementById('tutorial').style.display==='none';
+ document.getElementById('realPlayerName').value='';
+ document.getElementById('realPlayerPassword').value='';
+ document.getElementById('realLoginError').textContent='';
+ document.getElementById('realLogin').style.display='flex';
+ document.getElementById('realPlayerName').focus();
+}
+document.getElementById('cancelRealLogin').onclick=()=>{document.getElementById('realLogin').style.display='none';};
+document.getElementById('realLoginForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const form=event.currentTarget;
+ const button=form.querySelector('button[type="submit"]');
+ if(button.disabled)return;
+ const name=document.getElementById('realPlayerName').value.trim();
+ const password=document.getElementById('realPlayerPassword').value;
+ const error=document.getElementById('realLoginError');
+ if(!['jake','jacob'].includes(name.toLowerCase())||password!=='10282011'){
+  error.textContent='Wrong name and/or password.';return;
+ }
+ button.disabled=true;error.textContent='Checking Real Money eligibility…';
+ try{
+  const result=await sayWhatRequest({action:'sayWhatClaim',name,password});
+  if(result.allowed&&result.token){
+   sayWhatToken=result.token;
+   error.textContent='';document.getElementById('realLogin').style.display='none';
+   startMode('real',false);
+  }else if(result.reason==='already_played'){
+   error.textContent='Real Money Mode has already been played. Practice Mode is still available.';
+  }else if(result.reason==='wrong_credentials'){
+   error.textContent='Wrong name and/or password.';
+  }else error.textContent='Unable to verify Real Money eligibility. No entry was started.';
+ }catch(e){error.textContent=e.message+' Real Money Mode was not started.';}
+ finally{button.disabled=false;}
+});
+function setNextPuzzleLabel(){
+ const btn=document.getElementById('next');
+ btn.innerHTML='<small>quit this puzzle</small><span>NEXT PUZZLE</span>';
+}
+// --- HOW TO PLAY / mode selection ----------------------------------------
+function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function realMoneyIntro(){
+ const overlay=$("#realTransition");
+ const word=$("#realTransitionWord");
+ overlay.classList.add("show");
+ const messages=["LISTEN","REMEMBER","PUT THE PHRASE IN ORDER"];
+ for(const message of messages){
+   word.textContent=message;
+   word.classList.remove("flash");
+   void word.offsetWidth;
+   word.classList.add("flash");
+   await delay(2000);
+   word.classList.remove("flash");
+   word.textContent="";
+   await delay(300);
+ }
+ overlay.classList.remove("show");
+}
+async function startMode(mode, showRealIntro=false){
+ clearInterval(realSessionInterval);realSessionInterval=null;realSessionEnded=false;
+ gameMode=mode;
+ p=0;
+ bank=0;
+ realPuzzlesStarted=0;
+ $("#bank").textContent="$0.00";
+ $("#tutorial").style.display="none";
+ // Skip the old LISTEN / REMEMBER / PUT THE PHRASE IN ORDER transition.
+ if(mode==="real")beginRealSessionClock();else updateRealSessionDisplay();
+ load();
+ initialShuffle();
+}
+$("#practiceMode").onclick=()=>startMode("practice");
+$("#realMode").onclick=openRealLogin;
+$("#switchReal").onclick=openRealLogin;
+$("#backInstructions").onclick=()=>{
+ if(gameMode!=="practice")return;
+ if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ stopTimer();
+ gameMode=null;
+ $("#backInstructions").style.display="none";
+ $("#switchReal").style.display="none";
+ $("#tutorial").style.display="flex";
+};
+</script></body></html>
