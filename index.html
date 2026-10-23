@@ -414,7 +414,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none">RETURN TO INSTRUCTIONS</button>
  <button id="switchReal">PLAY FOR REAL MONEY</button>
 </div>
-<div class="mock">Practice is unlimited. Real Money entry and final results are verified with Google Sheets.</div>
+<div class="mock" id="gameVersion">Game version: 1.1.2 — 2026-10-23</div>
 </div></div>
 
 <script>
@@ -705,7 +705,7 @@ function flickerPlaybackSquare(identity){
  });
 }
 
-// Prerecorded Roger audio, trimmed to remove excess silence.
+// Prerecorded audio, trimmed to remove excess silence.
 // Web Audio schedules the next tile 200 ms after the previous clip ends.
 const tileAudioFiles = {"WHO": "who.mp3", "LET": "let.mp3", "THE": "the.mp3", "DOGS": "dogs.mp3", "OUT": "out.mp3", "THERE'S": "there-s.mp3", "NO": "no.mp3", "PLACE": "place.mp3", "LIKE": "like.mp3", "HOME": "home.mp3", "LET'S": "let-s.mp3", "GET": "get.mp3", "THIS": "this.mp3", "PARTY": "party.mp3", "STARTED": "started.mp3", "KEEP": "keep.mp3", "CALM": "calm.mp3", "AND": "and.mp3", "CARRY": "carry.mp3", "ON": "on.mp3", "SHOW": "show.mp3", "MUST": "must.mp3", "GO": "go.mp3", "DON'T": "don-t.mp3", "TRY": "try.mp3", "AT": "at.mp3", "AHEAD": "ahead.mp3", "MAKE": "make.mp3", "MY": "my.mp3", "DAY": "day.mp3", "CUSTOMER": "customer.mp3", "IS": "is.mp3", "ALWAYS": "always.mp3", "RIGHT": "right.mp3", "ALL": "all.mp3", "GOOD": "good.mp3", "THINGS": "things.mp3", "END": "end.mp3", "HONESTY": "honesty.mp3", "BEST": "best.mp3", "POLICY": "policy.mp3", "EVERY": "every.mp3", "DOG": "dog.mp3", "HAS": "has.mp3", "ITS": "its.mp3", "ROSE": "rose.mp3", "THORN": "thorn.mp3", "DIARY": "diary.mp3", "OF": "of.mp3", "A": "a.mp3", "WIMPY": "wimpy.mp3", "KID": "kid.mp3", "SNOW": "snow.mp3", "WHITE": "white.mp3", "AND THE": "and-the.mp3", "SEVEN": "seven.mp3", "DWARVES": "dwarves.mp3", "WALT": "walt.mp3", "DISNEY": "disney.mp3", "WORLD": "world.mp3", "ORLANDO": "orlando.mp3", "FLORIDA": "florida.mp3", "FOLLOW": "follow.mp3", "YELLOW": "yellow.mp3", "BRICK": "brick.mp3", "ROAD": "road.mp3", "SPIDER": "spider.mp3", "MAN": "man.mp3", "FAR": "far.mp3", "FROM": "from.mp3", "ALPHA": "alpha.mp3", "BRAVO": "bravo.mp3", "CHARLIE": "charlie.mp3", "DELTA": "delta.mp3", "ECHO": "echo.mp3", "MAY": "may.mp3", "THE FORCE": "the-force.mp3", "BE": "be.mp3", "WITH": "with.mp3", "YOU": "you.mp3", "CRY": "cry.mp3", "OVER": "over.mp3", "SPILLED": "spilled.mp3", "MILK": "milk.mp3", "ANOTHER": "another.mp3", "ONE": "one.mp3", "BITES": "bites.mp3", "DUST": "dust.mp3", "LIFE": "life.mp3", "A BOX": "a-box.mp3", "OF CHOCOLATES": "of-chocolates.mp3", "TIMES": "times.mp3", "ROLL": "roll.mp3", "SWEAT": "sweat.mp3", "SMALL": "small.mp3", "STUFF": "stuff.mp3", "ACTIONS": "actions.mp3", "SPEAK": "speak.mp3", "LOUDER": "louder.mp3", "THAN": "than.mp3", "WORDS": "words.mp3", "ROADS": "roads.mp3", "LEAD": "lead.mp3", "TO": "to.mp3", "ROME": "rome.mp3", "BALL": "ball.mp3", "IN YOUR": "in-your.mp3", "COURT": "court.mp3", "WATCHED": "watched.mp3", "POT": "pot.mp3", "NEVER": "never.mp3", "BOILS": "boils.mp3", "CLOUD": "cloud.mp3", "A SILVER": "a-silver.mp3", "LINING": "lining.mp3", "BIRDS": "birds.mp3", "OF A": "of-a.mp3", "FEATHER": "feather.mp3", "FLOCK": "flock.mp3", "TOGETHER": "together.mp3", "A ROLLING": "a-rolling.mp3", "STONE": "stone.mp3", "GATHERS": "gathers.mp3", "MOSS": "moss.mp3", "THE PROOF": "the-proof.mp3", "IN": "in.mp3", "PUDDING": "pudding.mp3"};
 const TILE_AUDIO_GAP_SECONDS = 0.20;
@@ -763,7 +763,7 @@ async function speakSubmittedOrder(done){
     if(serial!==playbackSerial)return;
     tileAudioCache.delete(chunks.find(c=>!tileAudioFiles[c])||chunks[0]);
     submitting=false;
-    const msg='ROGER AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
+    const msg='AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
     $('#feedback').className='feedback bad';
     $('#feedback').textContent=msg;
     $('#submit').disabled=false;
@@ -897,6 +897,26 @@ function updateTimer(){
 function stopTimer(){
  if(timerId){clearInterval(timerId);timerId=null;}
 }
+function chooseChallengingTileOrder(){
+ const candidates=[];
+ function visit(prefix,remaining){
+   if(!remaining.length){
+     const correctPositions=prefix.filter((tile,i)=>tile===i).length;
+     let longestRun=1,run=1;
+     for(let i=1;i<prefix.length;i++){
+       run=prefix[i]===prefix[i-1]+1?run+1:1;
+       longestRun=Math.max(longestRun,run);
+     }
+     // Require at least three displaced tiles, and break all 3+ tile runs.
+     if(correctPositions<=2 && longestRun<=2)candidates.push(prefix);
+     return;
+   }
+   remaining.forEach((tile,i)=>visit([...prefix,tile],remaining.filter((_,j)=>i!==j)));
+ }
+ visit([],[0,1,2,3,4]);
+ return candidates[Math.floor(Math.random()*candidates.length)].slice();
+}
+
 function load(){
  if(realSessionEnded&&gameMode==='real')return;
  if(gameMode==='real'){
@@ -907,10 +927,9 @@ function load(){
  stopTileAudio();
  if("speechSynthesis" in window) window.speechSynthesis.cancel();
  heardOrder=[];choice=[];submitting=false;timerStarted=false;phase="order";
- // Fisher-Yates shuffle; never start in the already-solved order.
- dragOrder=[0,1,2,3,4];
- for(let i=4;i>0;i--){const j=Math.floor(Math.random()*(i+1));[dragOrder[i],dragOrder[j]]=[dragOrder[j],dragOrder[i]];}
- if(dragOrder.every((v,i)=>v===i))[dragOrder[0],dragOrder[1]]=[dragOrder[1],dragOrder[0]];
+ // Choose uniformly from challenging permutations, rather than allowing
+ // easy circular shifts or long already-correct runs.
+ dragOrder=chooseChallengingTileOrder();
  firstRealSubmission=true;
  timeLeft=60;updateTimer();
  $("#feedback").className="feedback";$("#feedback").textContent="";
@@ -946,7 +965,7 @@ $('#next').onclick=()=>{
  dragOrder=puzzles[p].answer.slice();
  setNextPuzzleLabel();
  $('#feedback').className='feedback';
- $('#feedback').textContent='CORRECT ORDER — LISTEN TO ROGER, THEN CLICK NEXT PUZZLE WHEN READY.';
+ $('#feedback').textContent='CORRECT ORDER — LISTEN TO THE PHRASE, THEN CLICK NEXT PUZZLE WHEN READY.';
  $('#submit').classList.add('hidden');
  $('#next').disabled=false;
  render();
