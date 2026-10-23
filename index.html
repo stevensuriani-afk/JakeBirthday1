@@ -418,13 +418,9 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 </div></div>
 
 <script>
-const puzzles=[
- {parts:["STEP","SMALL","ONE","MAN","FOR"], answer:[2,1,0,4,3], phrase:"ONE SMALL STEP FOR MAN"},
- {parts:["THE WORM","EARLY","THE","GETS","BIRD"], answer:[2,1,4,3,0], phrase:"THE EARLY BIRD GETS THE WORM"},
- {parts:["YOU","FORCE","WITH","THE","BE"], answer:[3,1,4,2,0], phrase:"THE FORCE BE WITH YOU"},
- {parts:["GOLD","GLITTERS","ALL","NOT","THAT"], answer:[3,2,4,1,0], phrase:"NOT ALL THAT GLITTERS GOLD"},
- {parts:["A DAY","THE DOCTOR","AN APPLE","KEEPS","AWAY"], answer:[2,0,3,1,4], phrase:"AN APPLE A DAY KEEPS THE DOCTOR AWAY"}
-];
+const practicePuzzles=[{"parts": ["WHO", "LET", "THE", "DOGS", "OUT"], "answer": [0, 1, 2, 3, 4], "phrase": "WHO LET THE DOGS OUT"}, {"parts": ["THERE'S", "NO", "PLACE", "LIKE", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "THERE'S NO PLACE LIKE HOME"}, {"parts": ["LET'S", "GET", "THIS", "PARTY", "STARTED"], "answer": [0, 1, 2, 3, 4], "phrase": "LET'S GET THIS PARTY STARTED"}, {"parts": ["KEEP", "CALM", "AND", "CARRY", "ON"], "answer": [0, 1, 2, 3, 4], "phrase": "KEEP CALM AND CARRY ON"}, {"parts": ["THE", "SHOW", "MUST", "GO", "ON"], "answer": [0, 1, 2, 3, 4], "phrase": "THE SHOW MUST GO ON"}, {"parts": ["DON'T", "TRY", "THIS", "AT", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T TRY THIS AT HOME"}, {"parts": ["GO", "AHEAD", "MAKE", "MY", "DAY"], "answer": [0, 1, 2, 3, 4], "phrase": "GO AHEAD MAKE MY DAY"}, {"parts": ["THE", "CUSTOMER", "IS", "ALWAYS", "RIGHT"], "answer": [0, 1, 2, 3, 4], "phrase": "THE CUSTOMER IS ALWAYS RIGHT"}, {"parts": ["ALL", "GOOD", "THINGS", "MUST", "END"], "answer": [0, 1, 2, 3, 4], "phrase": "ALL GOOD THINGS MUST END"}, {"parts": ["HONESTY", "IS", "THE", "BEST", "POLICY"], "answer": [0, 1, 2, 3, 4], "phrase": "HONESTY IS THE BEST POLICY"}, {"parts": ["EVERY", "DOG", "HAS", "ITS", "DAY"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY DOG HAS ITS DAY"}, {"parts": ["EVERY", "ROSE", "HAS", "ITS", "THORN"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY ROSE HAS ITS THORN"}];
+const realPuzzles=[{"parts": ["DIARY", "OF", "A", "WIMPY", "KID"], "answer": [0, 1, 2, 3, 4], "phrase": "DIARY OF A WIMPY KID"}, {"parts": ["SNOW", "WHITE", "AND THE", "SEVEN", "DWARVES"], "answer": [0, 1, 2, 3, 4], "phrase": "SNOW WHITE AND THE SEVEN DWARVES"}, {"parts": ["WALT", "DISNEY", "WORLD", "ORLANDO", "FLORIDA"], "answer": [0, 1, 2, 3, 4], "phrase": "WALT DISNEY WORLD ORLANDO FLORIDA"}, {"parts": ["FOLLOW", "THE", "YELLOW", "BRICK", "ROAD"], "answer": [0, 1, 2, 3, 4], "phrase": "FOLLOW THE YELLOW BRICK ROAD"}, {"parts": ["SPIDER", "MAN", "FAR", "FROM", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "SPIDER MAN FAR FROM HOME"}, {"parts": ["ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO"], "answer": [0, 1, 2, 3, 4], "phrase": "ALPHA BRAVO CHARLIE DELTA ECHO"}, {"parts": ["MAY", "THE FORCE", "BE", "WITH", "YOU"], "answer": [0, 1, 2, 3, 4], "phrase": "MAY THE FORCE BE WITH YOU"}, {"parts": ["DON'T", "CRY", "OVER", "SPILLED", "MILK"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T CRY OVER SPILLED MILK"}, {"parts": ["ANOTHER", "ONE", "BITES", "THE", "DUST"], "answer": [0, 1, 2, 3, 4], "phrase": "ANOTHER ONE BITES THE DUST"}, {"parts": ["LIFE", "IS", "LIKE", "A BOX", "OF CHOCOLATES"], "answer": [0, 1, 2, 3, 4], "phrase": "LIFE IS LIKE A BOX OF CHOCOLATES"}, {"parts": ["LET", "THE", "GOOD", "TIMES", "ROLL"], "answer": [0, 1, 2, 3, 4], "phrase": "LET THE GOOD TIMES ROLL"}, {"parts": ["DON'T", "SWEAT", "THE", "SMALL", "STUFF"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T SWEAT THE SMALL STUFF"}, {"parts": ["ACTIONS", "SPEAK", "LOUDER", "THAN", "WORDS"], "answer": [0, 1, 2, 3, 4], "phrase": "ACTIONS SPEAK LOUDER THAN WORDS"}, {"parts": ["ALL", "ROADS", "LEAD", "TO", "ROME"], "answer": [0, 1, 2, 3, 4], "phrase": "ALL ROADS LEAD TO ROME"}, {"parts": ["THE", "BALL", "IS", "IN YOUR", "COURT"], "answer": [0, 1, 2, 3, 4], "phrase": "THE BALL IS IN YOUR COURT"}, {"parts": ["A", "WATCHED", "POT", "NEVER", "BOILS"], "answer": [0, 1, 2, 3, 4], "phrase": "A WATCHED POT NEVER BOILS"}, {"parts": ["EVERY", "CLOUD", "HAS", "A SILVER", "LINING"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY CLOUD HAS A SILVER LINING"}, {"parts": ["BIRDS", "OF A", "FEATHER", "FLOCK", "TOGETHER"], "answer": [0, 1, 2, 3, 4], "phrase": "BIRDS OF A FEATHER FLOCK TOGETHER"}, {"parts": ["A ROLLING", "STONE", "GATHERS", "NO", "MOSS"], "answer": [0, 1, 2, 3, 4], "phrase": "A ROLLING STONE GATHERS NO MOSS"}, {"parts": ["THE PROOF", "IS", "IN", "THE", "PUDDING"], "answer": [0, 1, 2, 3, 4], "phrase": "THE PROOF IS IN THE PUDDING"}];
+let puzzles=practicePuzzles;
 let p=0,heardOrder=[],choice=[],phase="listen",bank=0;
 const REAL_PUZZLE_LIMIT=20,REAL_BANK_LIMIT=50,REAL_PUZZLE_VALUE=2.50;
 let realPuzzlesStarted=0;
@@ -477,7 +473,8 @@ function endRealSession(reason="30 MINUTES COMPLETE"){
  if(gameMode==='real')void saveSayWhatResult(reason);
  clearInterval(realSessionInterval);realSessionInterval=null;
  stopTimer();timerStarted=false;submitting=false;phase='sessionEnded';
- if('speechSynthesis' in window)window.speechSynthesis.cancel();
+ stopTileAudio();
+  if('speechSynthesis' in window)window.speechSynthesis.cancel();
  document.querySelector('#submit').classList.add('hidden');
  document.querySelector('#next').classList.add('hidden');
  document.querySelector('#switchReal').style.display='none';
@@ -685,7 +682,6 @@ function render(){
 }
 function startOrder(){
  phase="order";
- dragOrder=[0,1,2,3,4];
  submitting=false;
  timerStarted=false;
  timeLeft=60;
@@ -708,39 +704,69 @@ function flickerPlaybackSquare(identity){
    setTimeout(()=>b.classList.remove("playback-flicker"),delay+55);
  });
 }
-function speakSubmittedOrder(done){
- if(!("speechSynthesis" in window)){setTimeout(done,300);return;}
- window.speechSynthesis.cancel();
- // Keep the same single utterance, preferred voice, and 0.72 rate.
- // Visual cues are timed independently because some browser voices only
- // report a boundary event for the first spoken chunk.
- const chunks=dragOrder.map(i=>puzzles[p].parts[i]);
- // TTS can interpret the all-caps word SAT as the initials S.A.T.
- // Keep the visual chunk unchanged, but force that exact chunk to spoken lowercase.
- const spokenChunks=chunks.map(chunk=>chunk.trim().toUpperCase()==="SAT" ? "sat" : chunk);
- const submitted=spokenChunks.join(". ");
- const prefix="…  ";
- const u=makeUtterance(prefix+submitted,0.72);
- let cueTimers=[];
- u.onstart=()=>{
-   // Flicker every square in spoken order. Estimate each chunk's speaking
-   // time from its length so the cue advances naturally with the phrase.
-   let elapsed=0;
-   chunks.forEach((chunk,index)=>{
-     cueTimers.push(setTimeout(()=>flickerPlaybackSquare(dragOrder[index]),elapsed));
-     const words=chunk.trim().split(/\s+/).filter(Boolean).length;
-     elapsed += 330 + (chunk.length*58) + (Math.max(0,words-1)*90);
-   });
- };
- const finish=()=>{
-   cueTimers.forEach(clearTimeout);
-   cueTimers=[];
-   if(done)done();
- };
- u.onend=finish;
- u.onerror=finish;
- window.speechSynthesis.speak(u);
+
+// Prerecorded Roger audio, trimmed to remove excess silence.
+// Web Audio schedules the next tile 30 ms after the previous clip ends.
+const tileAudioFiles = {"WHO": "who.mp3", "LET": "let.mp3", "THE": "the.mp3", "DOGS": "dogs.mp3", "OUT": "out.mp3", "THERE'S": "there-s.mp3", "NO": "no.mp3", "PLACE": "place.mp3", "LIKE": "like.mp3", "HOME": "home.mp3", "LET'S": "let-s.mp3", "GET": "get.mp3", "THIS": "this.mp3", "PARTY": "party.mp3", "STARTED": "started.mp3", "KEEP": "keep.mp3", "CALM": "calm.mp3", "AND": "and.mp3", "CARRY": "carry.mp3", "ON": "on.mp3", "SHOW": "show.mp3", "MUST": "must.mp3", "GO": "go.mp3", "DON'T": "don-t.mp3", "TRY": "try.mp3", "AT": "at.mp3", "AHEAD": "ahead.mp3", "MAKE": "make.mp3", "MY": "my.mp3", "DAY": "day.mp3", "CUSTOMER": "customer.mp3", "IS": "is.mp3", "ALWAYS": "always.mp3", "RIGHT": "right.mp3", "ALL": "all.mp3", "GOOD": "good.mp3", "THINGS": "things.mp3", "END": "end.mp3", "HONESTY": "honesty.mp3", "BEST": "best.mp3", "POLICY": "policy.mp3", "EVERY": "every.mp3", "DOG": "dog.mp3", "HAS": "has.mp3", "ITS": "its.mp3", "ROSE": "rose.mp3", "THORN": "thorn.mp3", "DIARY": "diary.mp3", "OF": "of.mp3", "A": "a.mp3", "WIMPY": "wimpy.mp3", "KID": "kid.mp3", "SNOW": "snow.mp3", "WHITE": "white.mp3", "AND THE": "and-the.mp3", "SEVEN": "seven.mp3", "DWARVES": "dwarves.mp3", "WALT": "walt.mp3", "DISNEY": "disney.mp3", "WORLD": "world.mp3", "ORLANDO": "orlando.mp3", "FLORIDA": "florida.mp3", "FOLLOW": "follow.mp3", "YELLOW": "yellow.mp3", "BRICK": "brick.mp3", "ROAD": "road.mp3", "SPIDER": "spider.mp3", "MAN": "man.mp3", "FAR": "far.mp3", "FROM": "from.mp3", "ALPHA": "alpha.mp3", "BRAVO": "bravo.mp3", "CHARLIE": "charlie.mp3", "DELTA": "delta.mp3", "ECHO": "echo.mp3", "MAY": "may.mp3", "THE FORCE": "the-force.mp3", "BE": "be.mp3", "WITH": "with.mp3", "YOU": "you.mp3", "CRY": "cry.mp3", "OVER": "over.mp3", "SPILLED": "spilled.mp3", "MILK": "milk.mp3", "ANOTHER": "another.mp3", "ONE": "one.mp3", "BITES": "bites.mp3", "DUST": "dust.mp3", "LIFE": "life.mp3", "A BOX": "a-box.mp3", "OF CHOCOLATES": "of-chocolates.mp3", "TIMES": "times.mp3", "ROLL": "roll.mp3", "SWEAT": "sweat.mp3", "SMALL": "small.mp3", "STUFF": "stuff.mp3", "ACTIONS": "actions.mp3", "SPEAK": "speak.mp3", "LOUDER": "louder.mp3", "THAN": "than.mp3", "WORDS": "words.mp3", "ROADS": "roads.mp3", "LEAD": "lead.mp3", "TO": "to.mp3", "ROME": "rome.mp3", "BALL": "ball.mp3", "IN YOUR": "in-your.mp3", "COURT": "court.mp3", "WATCHED": "watched.mp3", "POT": "pot.mp3", "NEVER": "never.mp3", "BOILS": "boils.mp3", "CLOUD": "cloud.mp3", "A SILVER": "a-silver.mp3", "LINING": "lining.mp3", "BIRDS": "birds.mp3", "OF A": "of-a.mp3", "FEATHER": "feather.mp3", "FLOCK": "flock.mp3", "TOGETHER": "together.mp3", "A ROLLING": "a-rolling.mp3", "STONE": "stone.mp3", "GATHERS": "gathers.mp3", "MOSS": "moss.mp3", "THE PROOF": "the-proof.mp3", "IN": "in.mp3", "PUDDING": "pudding.mp3"};
+const tileAudioCache = new Map();
+let tileAudioContext = null, activeTileSources = [], playbackSerial = 0;
+function stopTileAudio(){
+  playbackSerial++;
+  activeTileSources.forEach(s=>{try{s.stop()}catch(e){}});
+  activeTileSources=[];
 }
+async function loadTileBuffer(tile){
+  if(!tileAudioContext)tileAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+  if(!tileAudioCache.has(tile)){
+    const filename=tileAudioFiles[tile];
+    if(!filename)throw new Error('Missing audio tile '+tile);
+    const promise=fetch('audio/'+encodeURIComponent(filename))
+      .then(r=>{if(!r.ok)throw new Error('Audio HTTP '+r.status);return r.arrayBuffer()})
+      .then(b=>tileAudioContext.decodeAudioData(b));
+    tileAudioCache.set(tile,promise);
+  }
+  return tileAudioCache.get(tile);
+}
+async function speakSubmittedOrder(done){
+  stopTileAudio();
+  const serial=playbackSerial;
+  const identities=dragOrder.slice();
+  const chunks=identities.map(i=>puzzles[p].parts[i]);
+  try{
+    if(!tileAudioContext)tileAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+    await tileAudioContext.resume();
+    const buffers=await Promise.all(chunks.map(loadTileBuffer));
+    if(serial!==playbackSerial)return;
+    let when=tileAudioContext.currentTime+0.07;
+    const endAt=when+buffers.reduce((n,b)=>n+b.duration,0)+0.03*(buffers.length-1);
+    buffers.forEach((buffer,index)=>{
+      const src=tileAudioContext.createBufferSource();
+      src.buffer=buffer;
+      src.connect(tileAudioContext.destination);
+      src.start(when);
+      activeTileSources.push(src);
+      const delay=Math.max(0,(when-tileAudioContext.currentTime)*1000);
+      setTimeout(()=>{if(serial===playbackSerial)flickerPlaybackSquare(identities[index]);},delay);
+      when+=buffer.duration+0.03;
+    });
+    setTimeout(()=>{
+      if(serial!==playbackSerial)return;
+      activeTileSources=[];
+      if(done)done();
+    },Math.max(0,(endAt-tileAudioContext.currentTime)*1000)+30);
+  }catch(err){
+    console.error('Recorded audio failed:',err);
+    if(serial!==playbackSerial)return;
+    // Browser TTS fallback for a missing/corrupt MP3 or local file:// testing.
+    if(!('speechSynthesis' in window)){if(done)done();return;}
+    speechSynthesis.cancel();
+    const u=makeUtterance(chunks.join('. '),0.72);
+    u.onend=()=>{if(serial===playbackSerial&&done)done()};
+    u.onerror=()=>{if(serial===playbackSerial&&done)done()};
+    speechSynthesis.speak(u);
+  }
+}
+
 function submitAnswer(){
  if(realSessionEnded||phase!=="order"||submitting)return;
  const isBeginPuzzle=firstRealSubmission;
@@ -874,8 +900,13 @@ function load(){
    realPuzzlesStarted++;
  }
  stopTimer();
+ stopTileAudio();
  if("speechSynthesis" in window) window.speechSynthesis.cancel();
- heardOrder=[];choice=[];dragOrder=[0,1,2,3,4];submitting=false;timerStarted=false;phase="order";
+ heardOrder=[];choice=[];submitting=false;timerStarted=false;phase="order";
+ // Fisher-Yates shuffle; never start in the already-solved order.
+ dragOrder=[0,1,2,3,4];
+ for(let i=4;i>0;i--){const j=Math.floor(Math.random()*(i+1));[dragOrder[i],dragOrder[j]]=[dragOrder[j],dragOrder[i]];}
+ if(dragOrder.every((v,i)=>v===i))[dragOrder[0],dragOrder[1]]=[dragOrder[1],dragOrder[0]];
  firstRealSubmission=true;
  timeLeft=60;updateTimer();
  $("#feedback").className="feedback";$("#feedback").textContent="";
@@ -914,7 +945,8 @@ $("#next").onclick=()=>{
  const nextBtn=$("#next");
  nextBtn.disabled=true;
  submitting=true;
- if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ stopTileAudio();
+  if("speechSynthesis" in window)window.speechSynthesis.cancel();
  // Abandon the puzzle without awarding money, and reveal the correct arrangement.
  phase="result";
  dragOrder=puzzles[p].answer.slice();
@@ -1021,6 +1053,7 @@ async function realMoneyIntro(){
 async function startMode(mode, showRealIntro=false){
  clearInterval(realSessionInterval);realSessionInterval=null;realSessionEnded=false;
  gameMode=mode;
+ puzzles=mode==="real"?realPuzzles:practicePuzzles;
  p=0;
  bank=0;
  realPuzzlesStarted=0;
@@ -1036,7 +1069,8 @@ $("#realMode").onclick=openRealLogin;
 $("#switchReal").onclick=openRealLogin;
 $("#backInstructions").onclick=()=>{
  if(gameMode!=="practice")return;
- if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ stopTileAudio();
+  if("speechSynthesis" in window)window.speechSynthesis.cancel();
  stopTimer();
  gameMode=null;
  $("#backInstructions").style.display="none";
