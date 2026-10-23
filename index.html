@@ -738,7 +738,7 @@ async function speakSubmittedOrder(done){
     const buffers=await Promise.all(chunks.map(loadTileBuffer));
     if(serial!==playbackSerial)return;
     let when=tileAudioContext.currentTime+0.07;
-    const endAt=when+buffers.reduce((n,b)=>n+b.duration,0)+0.03*(buffers.length-1);
+    const endAt=when+buffers.reduce((n,b)=>n+b.duration,0)+0.20*(buffers.length-1);
     buffers.forEach((buffer,index)=>{
       const src=tileAudioContext.createBufferSource();
       src.buffer=buffer;
