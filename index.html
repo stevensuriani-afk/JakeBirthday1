@@ -436,7 +436,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.17 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.18 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -1081,6 +1081,21 @@ $('#next').onclick=()=>{
  if(nextPuzzlePending||realSessionEnded)return;
  if(phase==='result'){
    if(gameMode==='real'&&realPuzzlesStarted>=REAL_PUZZLE_LIMIT){endRealSession('20 PUZZLES COMPLETE');return;}
+   if(gameMode==='practice' && p===practicePuzzles.length-1){
+     nextPuzzlePending=true;
+     stopTileAudio();
+     $('#feedback').className='feedback good';
+     $('#feedback').textContent='That was the last of the test puzzles, returning to first puzzle.';
+     $('#next').disabled=true;
+     setTimeout(()=>{
+       if(gameMode!=='practice') {nextPuzzlePending=false;return;}
+       p=0;
+       nextPuzzlePending=false;
+       load();
+       initialShuffle();
+     },2600);
+     return;
+   }
    advancePuzzle();return;
  }
  nextPuzzlePending=true;
@@ -1091,7 +1106,7 @@ $('#next').onclick=()=>{
  dragOrder=puzzles[p].answer.slice();
  setNextPuzzleLabel();
  $('#feedback').className='feedback';
- $('#feedback').textContent='Playing puzzle words in correct order';
+ $('#feedback').textContent='CORRECT ORDER — CLICK NEXT PUZZLE WHEN READY';
  $('#submit').classList.add('hidden');
  $('#next').disabled=false;
  render();
