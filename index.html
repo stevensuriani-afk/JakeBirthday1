@@ -416,7 +416,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 <div class="wrap"><div class="card game">
 <div style="font-size:34px">🎂 🔊 🧠 🎉</div>
 <div class="title">JAKE'S SAY WHAT?!</div>
-<div class="subtitle">LISTEN. REMEMBER. PUT THE PHRASE IN ORDER.</div>
+<div class="subtitle">LISTEN. REMEMBER. PUT THE PHRASE IN ORDER BY DRAGGING TILES. THEN CLICK SUBMIT.</div>
 <div id="modeIndicator" class="mode-indicator"></div>
 
 <div class="top">
@@ -445,10 +445,11 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
   <button id="next" class="hidden"><small>quit this puzzle</small><span>NEXT PUZZLE</span></button>
  </div>
  <div id="feedback" class="feedback fixed-message-slot"></div>
+ <button id="cashOut" type="button" class="hidden" style="display:block;margin:18px auto 0;padding:12px 26px;background:#16803b;color:white;border:0;border-radius:12px;font-size:18px;font-weight:900;cursor:pointer">CASH OUT</button>
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.19 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.20 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -581,7 +582,8 @@ function showJakeFinalScreen(reason){
  const reasons={
   '30 MINUTES COMPLETE':'Time is up — the 30-minute limit has been reached.',
   '$50 BANK LIMIT REACHED':'You reached the $50 maximum!',
-  '20 PUZZLES COMPLETE':'All 20 puzzles have been completed!'
+  '20 PUZZLES COMPLETE':'All 20 puzzles have been completed!',
+  'PLAYER CASHED OUT':'You chose to cash out early.'
  };
  document.getElementById('jakeFinalAmount').textContent='Aunt Georgia and Uncle Steve owe you $'+bank.toFixed(2);
  document.getElementById('jakeFinalReason').textContent=reasons[reason]||reason;
@@ -601,12 +603,17 @@ function endRealSession(reason="30 MINUTES COMPLETE"){
   if('speechSynthesis' in window)window.speechSynthesis.cancel();
  document.querySelector('#submit').classList.add('hidden');
  document.querySelector('#next').classList.add('hidden');
+ document.querySelector('#cashOut').classList.add('hidden');
  
  document.querySelector('#feedback').className='feedback good';
  document.querySelector('#feedback').textContent=reason+' — FINAL BIRTHDAY BANK: $'+bank.toFixed(2);
  updateRealSessionDisplay();
  showJakeFinalScreen(reason);
 }
+document.getElementById('cashOut').addEventListener('click',()=>{
+ if(gameMode!=='real'||realSessionEnded)return;
+ if(window.confirm('Cash out now with $'+bank.toFixed(2)+'? This will end your Real Money game.'))endRealSession('PLAYER CASHED OUT');
+});
 function beginRealSessionClock(){
  clearInterval(realSessionInterval);
  realSessionRemaining=REAL_SESSION_SECONDS;realSessionEnded=false;
@@ -829,7 +836,7 @@ function startOrder(){
  timerStarted=false;
  timeLeft=60;
  updateTimer();
- $("#phase").textContent="PUT THE PHRASE IN ORDER";
+ $("#phase").textContent="PUT THE PHRASE IN ORDER BY DRAGGING TILES. THEN CLICK SUBMIT.";
  $("#instruction").textContent="";
  $("#answerArea").classList.remove("hidden");
  $("#submit").classList.remove("hidden");
@@ -1123,6 +1130,7 @@ function load(){
  setNextPuzzleLabel();
  $("#next").disabled=false;
  
+ $("#cashOut").classList.toggle("hidden",gameMode!=="real"||realSessionEnded);
  $("#backInstructions").style.display=gameMode==="practice"?"block":"none";
  $("#modeIndicator").textContent=gameMode==="practice"?"PRACTICE MODE — NO REAL MONEY":"REAL MONEY MODE";
  $("#modeIndicator").className="mode-indicator "+(gameMode==="practice"?"practice-mode":"real-mode");
