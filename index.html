@@ -234,7 +234,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 /* Dedicated end-of-game celebration */
 #jakeFinal{position:fixed;inset:0;z-index:1200;background:linear-gradient(135deg,#eaf7ff,#fff4d6);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
 #jakeFinal .final-card{width:min(760px,100%);background:#fff;border-radius:24px;box-shadow:0 18px 65px #0003;text-align:center;padding:36px 24px;position:relative;z-index:1}
-#jakeFinal .final-amount{font-size:clamp(32px,6vw,60px);font-weight:1000;color:#16803b;margin:18px 0}
+#jakeFinal .final-amount{font-size:clamp(26px,4.2vw,42px);font-weight:1000;color:#16803b;margin:18px 0}
 #jakeFinal .final-reason{font-size:20px;font-weight:850;margin:20px 0;color:#374151}
 #jakeFireworks{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1250}
 </style><style>
@@ -368,7 +368,6 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <div class="final-amount" id="jakeFinalAmount">Aunt Georgia and Uncle Steve owe you $0.00</div>
  <div class="final-reason" id="jakeFinalReason"></div>
  <p>Enjoy your birthday!</p>
- <button type="button" id="jakeReplaySong" class="btn">PLAY HAPPY BIRTHDAY AGAIN</button>
  </div>
 </section>
 <canvas id="jakeFireworks" class="hidden"></canvas>
@@ -437,7 +436,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.16 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.17 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -578,7 +577,7 @@ function showJakeFinalScreen(reason){
  playJakeBirthdaySong();
  launchFireworks();
 }
-document.getElementById('jakeReplaySong').addEventListener('click',playJakeBirthdaySong);
+
 
 function endRealSession(reason="30 MINUTES COMPLETE"){
  if(realSessionEnded)return;
