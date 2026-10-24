@@ -844,17 +844,18 @@ const TILE_AUDIO_GAP_SECONDS = 0.20;
 // Using native HTMLAudioElement playback avoids Web Audio MP3 decoding / buffer
 // boundary artifacts and never overlaps or cuts off a tile to start the next.
 let activeTileAudio = null, playbackSerial = 0, tilePauseTimer = null;
+let preparedTileAudio = [];
 function stopTileAudio(){
   playbackSerial++;
   if(tilePauseTimer!==null){clearTimeout(tilePauseTimer);tilePauseTimer=null;}
-  if(activeTileAudio){
-    activeTileAudio.onended=null;
-    activeTileAudio.onerror=null;
-    activeTileAudio.pause();
-    activeTileAudio.removeAttribute('src');
-    activeTileAudio.load();
-    activeTileAudio=null;
+  // Cancel only on an explicit interruption, not between consecutive words.
+  for(const audio of preparedTileAudio){
+    audio.onended=null;
+    audio.onerror=null;
+    audio.pause();
   }
+  preparedTileAudio=[];
+  activeTileAudio=null;
 }
 function waitTilePause(serial){
   return new Promise(resolve=>{
@@ -865,24 +866,49 @@ function waitTilePause(serial){
     },TILE_AUDIO_GAP_SECONDS*1000);
   });
 }
+function prepareTileAudio(filename,serial){
+  const audio=new Audio();
+  audio.preload='auto';
+  audio.src='audio/'+encodeURIComponent(filename)+'?audio_revision=20261024d';
+  preparedTileAudio.push(audio);
+  return new Promise((resolve,reject)=>{
+    if(serial!==playbackSerial){resolve(null);return;}
+    if(audio.readyState>=HTMLMediaElement.HAVE_CURRENT_DATA){resolve(audio);return;}
+    const onReady=()=>{cleanup();resolve(audio);};
+    const onError=()=>{cleanup();reject(new Error(filename+' could not be loaded'));};
+    const cleanup=()=>{
+      audio.removeEventListener('loadeddata',onReady);
+      audio.removeEventListener('error',onError);
+    };
+    audio.addEventListener('loadeddata',onReady);
+    audio.addEventListener('error',onError);
+    audio.load();
+  });
+}
 async function speakSubmittedOrder(done){
   stopTileAudio();
   const serial=playbackSerial;
   const identities=dragOrder.slice();
   const chunks=identities.map(i=>puzzles[p].parts[i]);
   try{
-    for(let i=0;i<chunks.length;i++){
+    const filenames=chunks.map(chunk=>{
+      const filename=tileAudioFiles[chunk];
+      if(!filename)throw new Error('Missing audio tile '+chunk);
+      return filename;
+    });
+    // Prepare every recording before playback, and retain all five audio
+    // elements until the complete sequence has finished.
+    const audios=await Promise.all(filenames.map(filename=>prepareTileAudio(filename,serial)));
+    if(serial!==playbackSerial)return;
+    for(let i=0;i<audios.length;i++){
       if(!await waitTilePause(serial))return;
       if(serial!==playbackSerial)return;
-      const filename=tileAudioFiles[chunks[i]];
-      if(!filename)throw new Error('Missing audio tile '+chunks[i]);
-      const audio=new Audio('audio/'+encodeURIComponent(filename)+'?audio_revision=20261024c');
-      audio.preload='auto';
+      const audio=audios[i];
       activeTileAudio=audio;
       flickerPlaybackSquare(identities[i]);
       await new Promise((resolve,reject)=>{
         audio.onended=()=>resolve();
-        audio.onerror=()=>reject(new Error(filename+' could not be played'));
+        audio.onerror=()=>reject(new Error(filenames[i]+' could not be played'));
         audio.play().catch(reject);
       });
       if(serial!==playbackSerial)return;
@@ -896,6 +922,8 @@ async function speakSubmittedOrder(done){
     $('#feedback').className='feedback bad';
     $('#feedback').textContent='AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
     $('#submit').disabled=false;
+  }finally{
+    if(serial===playbackSerial){preparedTileAudio=[];activeTileAudio=null;}
   }
 }
 
