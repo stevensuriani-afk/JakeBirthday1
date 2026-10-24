@@ -429,16 +429,15 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <div class="right"><div class="label">ROUND VALUE</div><div id="value" class="money">$2.50</div></div>
 </div>
 
-<div id="phase" class="phase">LISTENING ROUND</div>
+<div id="phase" class="phase" aria-live="polite">LISTENING ROUND</div>
 <div id="sessionTimer" class="timer hidden" style="color:#16803b">REAL MONEY TIME LEFT: 30:00</div>
 
-<div id="instruction" class="instruction"></div>
-<div id="feedback" class="feedback fixed-message-slot" aria-live="polite"></div>
+
 <div id="boxes" class="boxes"></div>
 <div class="playback-speed-control" aria-label="Word playback spacing">
   <span class="playback-speed-label">WORD PLAYBACK SPEED</span>
   <button id="speedSlower" type="button" aria-label="Slower playback, longer pause between words" title="Slower (longer pause)">▼</button>
-  <span id="speedDisplay" aria-live="polite">Normal · 200 ms pause</span>
+  <span id="speedDisplay" aria-live="polite">0.2 seconds pause</span>
   <button id="speedFaster" type="button" aria-label="Faster playback, shorter pause between words" title="Faster (shorter pause)">▲</button>
 </div>
 
@@ -453,7 +452,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.21 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.23 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -486,7 +485,7 @@ async function saveSayWhatResult(reason){
  try{const result=await sayWhatRequest({action:'sayWhatFinish',token:sayWhatToken,amount:bank.toFixed(2),puzzles:realPuzzlesStarted,reason});
   if(!result.ok)throw new Error(result.error||'Spreadsheet declined the result');
  }catch(error){console.error('Unable to record Say What?! result:',error);
-  document.querySelector('#feedback').textContent+=' — Could not confirm spreadsheet recording. Contact the game administrator.';
+  document.querySelector('#phase').textContent+=' — Could not confirm spreadsheet recording. Contact the game administrator.';
  }finally{sayWhatFinishing=false;}
 }
 
@@ -609,8 +608,8 @@ function endRealSession(reason="30 MINUTES COMPLETE"){
  document.querySelector('#next').classList.add('hidden');
  document.querySelector('#cashOut').classList.add('hidden');
  
- document.querySelector('#feedback').className='feedback good';
- document.querySelector('#feedback').textContent=reason+' — FINAL BIRTHDAY BANK: $'+bank.toFixed(2);
+ document.querySelector('#phase').className='phase good';
+ document.querySelector('#phase').textContent=reason+' — FINAL BIRTHDAY BANK: $'+bank.toFixed(2);
  updateRealSessionDisplay();
  showJakeFinalScreen(reason);
 }
@@ -841,7 +840,7 @@ function startOrder(){
  timeLeft=60;
  updateTimer();
  $("#phase").textContent="PUT THE PHRASE IN ORDER BY DRAGGING TILES. THEN CLICK SUBMIT.";
- $("#instruction").textContent="";
+ 
  $("#answerArea").classList.remove("hidden");
  $("#submit").classList.remove("hidden");
  $("#submit").disabled=false;
@@ -869,8 +868,7 @@ const TILE_AUDIO_GAP_MAX_MS = 500;
 function updatePlaybackSpeedDisplay(){
   const display=document.getElementById('speedDisplay');
   if(!display)return;
-  const label=tileAudioGapMs===200?'Normal':tileAudioGapMs<200?'Faster':'Slower';
-  display.textContent=label+' · '+tileAudioGapMs+' ms pause';
+  display.textContent=(tileAudioGapMs / 1000).toFixed(2).replace(/0$/, '').replace(/\.$/, '')+' seconds pause';
   document.getElementById('speedFaster').disabled=tileAudioGapMs<=TILE_AUDIO_GAP_MIN_MS;
   document.getElementById('speedSlower').disabled=tileAudioGapMs>=TILE_AUDIO_GAP_MAX_MS;
 }
@@ -962,8 +960,8 @@ async function speakSubmittedOrder(done){
     console.error('Recorded audio failed:',err);
     if(serial!==playbackSerial)return;
     submitting=false;
-    $('#feedback').className='feedback bad';
-    $('#feedback').textContent='AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
+    $('#phase').className='phase bad';
+    $('#phase').textContent='AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
     $('#submit').disabled=false;
   }finally{
     if(serial===playbackSerial){preparedTileAudio=[];activeTileAudio=null;}
@@ -979,8 +977,8 @@ function submitAnswer(){
  }
  submitting=true;
  $("#submit").disabled=true;
- $("#feedback").className="feedback";
- $("#feedback").textContent="LISTEN TO THE WORDS…";
+ $("#phase").className="phase";
+ $("#phase").textContent="LISTEN TO THE WORDS…";
  render();
  if(isBeginPuzzle){
    // Listening time never counts against the player. Normally the clock has
@@ -991,8 +989,8 @@ function submitAnswer(){
    speakSubmittedOrder(()=>{
      if(phase!=="order")return;
      submitting=false;
-     $("#feedback").className="feedback";
-     $("#feedback").textContent="";
+     $("#phase").className="phase";
+     $("#phase").textContent="PUT THE PHRASE IN ORDER BY DRAGGING TILES. THEN CLICK SUBMIT.";
      $("#submit").disabled=false;
      
      render();
@@ -1017,8 +1015,8 @@ function checkAttempt(){
    phase="result";
    stopTimer();timerStarted=false;
    $("#submit").classList.add("hidden");
-   $("#feedback").className="feedback good";
-   $("#feedback").textContent="CORRECT";
+   $("#phase").className="phase good";
+   $("#phase").textContent="CORRECT";
    if(gameMode==="real"){bank=Math.min(REAL_BANK_LIMIT,bank+REAL_PUZZLE_VALUE);$("#bank").textContent="$"+bank.toFixed(2);}
    successSound();
    if(gameMode==="real"&&(bank>=REAL_BANK_LIMIT||realPuzzlesStarted>=REAL_PUZZLE_LIMIT)){
@@ -1030,8 +1028,8 @@ function checkAttempt(){
    render();
  }else{
    submitting=false;
-   $("#feedback").className="feedback bad";
-   $("#feedback").textContent="NOT QUITE — REARRANGE THE BOXES AND TRY AGAIN.";
+   $("#phase").className="phase bad";
+   $("#phase").textContent="NOT QUITE — REARRANGE THE BOXES AND TRY AGAIN.";
    $("#submit").disabled=false;
    render();
  }
@@ -1073,8 +1071,8 @@ function timerTick(){
    submitting=false;
    $("#submit").classList.add("hidden");
    if("speechSynthesis" in window) window.speechSynthesis.cancel();
-   $("#feedback").className="feedback bad";
-   $("#feedback").textContent="OUT OF TIME";
+   $("#phase").className="phase bad";
+   $("#phase").textContent="OUT OF TIME";
    sadSound();
    $("#next").classList.add("hidden");
    render();
@@ -1129,7 +1127,7 @@ function load(){
  dragOrder=chooseChallengingTileOrder();
  firstRealSubmission=true;
  timeLeft=60;updateTimer();
- $("#feedback").className="feedback";$("#feedback").textContent="";
+ $("#phase").className="phase";$("#phase").textContent="PUT THE PHRASE IN ORDER BY DRAGGING TILES. THEN CLICK SUBMIT.";
  $("#next").classList.remove("hidden");
  setNextPuzzleLabel();
  $("#next").disabled=false;
@@ -1156,8 +1154,8 @@ $('#next').onclick=()=>{
    if(gameMode==='practice' && p===practicePuzzles.length-1){
      nextPuzzlePending=true;
      stopTileAudio();
-     $('#feedback').className='feedback good';
-     $('#feedback').textContent='That was the last of the test puzzles, returning to first puzzle.';
+     $('#phase').className='phase good';
+     $('#phase').textContent='That was the last of the test puzzles, returning to first puzzle.';
      $('#next').disabled=true;
      setTimeout(()=>{
        if(gameMode!=='practice') {nextPuzzlePending=false;return;}
@@ -1177,8 +1175,8 @@ $('#next').onclick=()=>{
  phase='result';
  dragOrder=puzzles[p].answer.slice();
  setNextPuzzleLabel();
- $('#feedback').className='feedback';
- $('#feedback').textContent='CORRECT ORDER — CLICK NEXT PUZZLE WHEN READY';
+ $('#phase').className='phase';
+ $('#phase').textContent='CORRECT ORDER — CLICK NEXT PUZZLE WHEN READY';
  $('#submit').classList.add('hidden');
  $('#next').disabled=false;
  render();
