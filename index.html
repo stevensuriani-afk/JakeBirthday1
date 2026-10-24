@@ -261,6 +261,9 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
   overflow-wrap:anywhere !important;
 }
 
+/* Keep revealed words such as DWARFS on a single line. */
+.wordbox.revealed{white-space:nowrap !important;overflow-wrap:normal !important;word-break:normal !important;font-size:clamp(12px,2.0vw,24px) !important;padding:3px !important;}
+
 .wordbox.slow-solve{
   transition:transform 1.8s cubic-bezier(.22,.61,.36,1) !important;
   position:relative;
@@ -414,14 +417,14 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  </div>
  <div id="feedback" class="feedback fixed-message-slot"></div>
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
- <button id="switchReal">PLAY FOR REAL MONEY</button>
+ 
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.9 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.10 — 2026-10-24</div>
 </div></div>
 
 <script>
 const practicePuzzles=[{"parts": ["WHO", "LET", "THE", "DOGS", "OUT"], "answer": [0, 1, 2, 3, 4], "phrase": "WHO LET THE DOGS OUT"}, {"parts": ["THERE'S", "NO", "PLACE", "LIKE", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "THERE'S NO PLACE LIKE HOME"}, {"parts": ["LET'S", "GET", "THIS", "PARTY", "STARTED"], "answer": [0, 1, 2, 3, 4], "phrase": "LET'S GET THIS PARTY STARTED"}, {"parts": ["KEEP", "CALM", "AND", "CARRY", "ON"], "answer": [0, 1, 2, 3, 4], "phrase": "KEEP CALM AND CARRY ON"}, {"parts": ["THE", "SHOW", "MUST", "GO", "ON"], "answer": [0, 1, 2, 3, 4], "phrase": "THE SHOW MUST GO ON"}, {"parts": ["DON'T", "TRY", "THIS", "AT", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T TRY THIS AT HOME"}, {"parts": ["GO", "AHEAD", "MAKE", "MY", "DAY"], "answer": [0, 1, 2, 3, 4], "phrase": "GO AHEAD MAKE MY DAY"}, {"parts": ["THE", "CUSTOMER", "IS", "ALWAYS", "RIGHT"], "answer": [0, 1, 2, 3, 4], "phrase": "THE CUSTOMER IS ALWAYS RIGHT"}, {"parts": ["ALL", "GOOD", "THINGS", "MUST", "END"], "answer": [0, 1, 2, 3, 4], "phrase": "ALL GOOD THINGS MUST END"}, {"parts": ["HONESTY", "IS", "THE", "BEST", "POLICY"], "answer": [0, 1, 2, 3, 4], "phrase": "HONESTY IS THE BEST POLICY"}, {"parts": ["EVERY", "DOG", "HAS", "ITS", "DAY"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY DOG HAS ITS DAY"}, {"parts": ["EVERY", "ROSE", "HAS", "ITS", "THORN"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY ROSE HAS ITS THORN"}];
-const realPuzzles=[{"parts": ["DIARY", "OF", "A", "WIMPY", "KID"], "answer": [0, 1, 2, 3, 4], "phrase": "DIARY OF A WIMPY KID"}, {"parts": ["SNOW", "WHITE", "AND THE", "SEVEN", "DWARVES"], "answer": [0, 1, 2, 3, 4], "phrase": "SNOW WHITE AND THE SEVEN DWARVES"}, {"parts": ["WALT", "DISNEY", "WORLD", "ORLANDO", "FLORIDA"], "answer": [0, 1, 2, 3, 4], "phrase": "WALT DISNEY WORLD ORLANDO FLORIDA"}, {"parts": ["FOLLOW", "THE", "YELLOW", "BRICK", "ROAD"], "answer": [0, 1, 2, 3, 4], "phrase": "FOLLOW THE YELLOW BRICK ROAD"}, {"parts": ["SPIDER", "MAN", "FAR", "FROM", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "SPIDER MAN FAR FROM HOME"}, {"parts": ["ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO"], "answer": [0, 1, 2, 3, 4], "phrase": "ALPHA BRAVO CHARLIE DELTA ECHO"}, {"parts": ["MAY", "THE FORCE", "BE", "WITH", "YOU"], "answer": [0, 1, 2, 3, 4], "phrase": "MAY THE FORCE BE WITH YOU"}, {"parts": ["DON'T", "CRY", "OVER", "SPILLED", "MILK"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T CRY OVER SPILLED MILK"}, {"parts": ["ANOTHER", "ONE", "BITES", "THE", "DUST"], "answer": [0, 1, 2, 3, 4], "phrase": "ANOTHER ONE BITES THE DUST"}, {"parts": ["LIFE", "IS", "LIKE", "A BOX", "OF CHOCOLATES"], "answer": [0, 1, 2, 3, 4], "phrase": "LIFE IS LIKE A BOX OF CHOCOLATES"}, {"parts": ["LET", "THE", "GOOD", "TIMES", "ROLL"], "answer": [0, 1, 2, 3, 4], "phrase": "LET THE GOOD TIMES ROLL"}, {"parts": ["DON'T", "SWEAT", "THE", "SMALL", "STUFF"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T SWEAT THE SMALL STUFF"}, {"parts": ["ACTIONS", "SPEAK", "LOUDER", "THAN", "WORDS"], "answer": [0, 1, 2, 3, 4], "phrase": "ACTIONS SPEAK LOUDER THAN WORDS"}, {"parts": ["ALL", "ROADS", "LEAD", "TO", "ROME"], "answer": [0, 1, 2, 3, 4], "phrase": "ALL ROADS LEAD TO ROME"}, {"parts": ["THE", "BALL", "IS", "IN YOUR", "COURT"], "answer": [0, 1, 2, 3, 4], "phrase": "THE BALL IS IN YOUR COURT"}, {"parts": ["A", "WATCHED", "POT", "NEVER", "BOILS"], "answer": [0, 1, 2, 3, 4], "phrase": "A WATCHED POT NEVER BOILS"}, {"parts": ["EVERY", "CLOUD", "HAS", "A SILVER", "LINING"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY CLOUD HAS A SILVER LINING"}, {"parts": ["BIRDS", "OF A", "FEATHER", "FLOCK", "TOGETHER"], "answer": [0, 1, 2, 3, 4], "phrase": "BIRDS OF A FEATHER FLOCK TOGETHER"}, {"parts": ["A ROLLING", "STONE", "GATHERS", "NO", "MOSS"], "answer": [0, 1, 2, 3, 4], "phrase": "A ROLLING STONE GATHERS NO MOSS"}, {"parts": ["THE PROOF", "IS", "IN", "THE", "PUDDING"], "answer": [0, 1, 2, 3, 4], "phrase": "THE PROOF IS IN THE PUDDING"}];
+const realPuzzles=[{"parts": ["DIARY", "OF", "A", "WIMPY", "KID"], "answer": [0, 1, 2, 3, 4], "phrase": "DIARY OF A WIMPY KID"}, {"parts": ["SNOW", "WHITE", "AND THE", "SEVEN", "DWARFS"], "answer": [0, 1, 2, 3, 4], "phrase": "SNOW WHITE AND THE SEVEN DWARFS"}, {"parts": ["WALT", "DISNEY", "WORLD", "ORLANDO", "FLORIDA"], "answer": [0, 1, 2, 3, 4], "phrase": "WALT DISNEY WORLD ORLANDO FLORIDA"}, {"parts": ["FOLLOW", "THE", "YELLOW", "BRICK", "ROAD"], "answer": [0, 1, 2, 3, 4], "phrase": "FOLLOW THE YELLOW BRICK ROAD"}, {"parts": ["SPIDER", "MAN", "FAR", "FROM", "HOME"], "answer": [0, 1, 2, 3, 4], "phrase": "SPIDER MAN FAR FROM HOME"}, {"parts": ["ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO"], "answer": [0, 1, 2, 3, 4], "phrase": "ALPHA BRAVO CHARLIE DELTA ECHO"}, {"parts": ["MAY", "THE FORCE", "BE", "WITH", "YOU"], "answer": [0, 1, 2, 3, 4], "phrase": "MAY THE FORCE BE WITH YOU"}, {"parts": ["DON'T", "CRY", "OVER", "SPILLED", "MILK"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T CRY OVER SPILLED MILK"}, {"parts": ["ANOTHER", "ONE", "BITES", "THE", "DUST"], "answer": [0, 1, 2, 3, 4], "phrase": "ANOTHER ONE BITES THE DUST"}, {"parts": ["LIFE", "IS", "LIKE", "A BOX", "OF CHOCOLATES"], "answer": [0, 1, 2, 3, 4], "phrase": "LIFE IS LIKE A BOX OF CHOCOLATES"}, {"parts": ["LET", "THE", "GOOD", "TIMES", "ROLL"], "answer": [0, 1, 2, 3, 4], "phrase": "LET THE GOOD TIMES ROLL"}, {"parts": ["DON'T", "SWEAT", "THE", "SMALL", "STUFF"], "answer": [0, 1, 2, 3, 4], "phrase": "DON'T SWEAT THE SMALL STUFF"}, {"parts": ["ACTIONS", "SPEAK", "LOUDER", "THAN", "WORDS"], "answer": [0, 1, 2, 3, 4], "phrase": "ACTIONS SPEAK LOUDER THAN WORDS"}, {"parts": ["ALL", "ROADS", "LEAD", "TO", "ROME"], "answer": [0, 1, 2, 3, 4], "phrase": "ALL ROADS LEAD TO ROME"}, {"parts": ["THE", "BALL", "IS", "IN YOUR", "COURT"], "answer": [0, 1, 2, 3, 4], "phrase": "THE BALL IS IN YOUR COURT"}, {"parts": ["A", "WATCHED", "POT", "NEVER", "BOILS"], "answer": [0, 1, 2, 3, 4], "phrase": "A WATCHED POT NEVER BOILS"}, {"parts": ["EVERY", "CLOUD", "HAS", "A SILVER", "LINING"], "answer": [0, 1, 2, 3, 4], "phrase": "EVERY CLOUD HAS A SILVER LINING"}, {"parts": ["BIRDS", "OF A", "FEATHER", "FLOCK", "TOGETHER"], "answer": [0, 1, 2, 3, 4], "phrase": "BIRDS OF A FEATHER FLOCK TOGETHER"}, {"parts": ["A ROLLING", "STONE", "GATHERS", "NO", "MOSS"], "answer": [0, 1, 2, 3, 4], "phrase": "A ROLLING STONE GATHERS NO MOSS"}, {"parts": ["THE PROOF", "IS", "IN", "THE", "PUDDING"], "answer": [0, 1, 2, 3, 4], "phrase": "THE PROOF IS IN THE PUDDING"}];
 let puzzles=practicePuzzles;
 let p=0,heardOrder=[],choice=[],phase="listen",bank=0;
 const REAL_PUZZLE_LIMIT=20,REAL_BANK_LIMIT=50,REAL_PUZZLE_VALUE=2.50;
@@ -479,7 +482,7 @@ function endRealSession(reason="30 MINUTES COMPLETE"){
   if('speechSynthesis' in window)window.speechSynthesis.cancel();
  document.querySelector('#submit').classList.add('hidden');
  document.querySelector('#next').classList.add('hidden');
- document.querySelector('#switchReal').style.display='none';
+ 
  document.querySelector('#feedback').className='feedback good';
  document.querySelector('#feedback').textContent=reason+' — FINAL BIRTHDAY BANK: $'+bank.toFixed(2);
  updateRealSessionDisplay();
@@ -709,7 +712,7 @@ function flickerPlaybackSquare(identity){
 
 // Prerecorded audio, trimmed to remove excess silence.
 // Web Audio schedules the next tile 200 ms after the previous clip ends.
-const tileAudioFiles = {"WHO": "who.mp3", "LET": "let.mp3", "THE": "the.mp3", "DOGS": "dogs.mp3", "OUT": "out.mp3", "THERE'S": "there-s.mp3", "NO": "no.mp3", "PLACE": "place.mp3", "LIKE": "like.mp3", "HOME": "home.mp3", "LET'S": "let-s.mp3", "GET": "get.mp3", "THIS": "this.mp3", "PARTY": "party.mp3", "STARTED": "started.mp3", "KEEP": "keep.mp3", "CALM": "calm.mp3", "AND": "and.mp3", "CARRY": "carry.mp3", "ON": "on.mp3", "SHOW": "show.mp3", "MUST": "must.mp3", "GO": "go.mp3", "DON'T": "don-t.mp3", "TRY": "try.mp3", "AT": "at.mp3", "AHEAD": "ahead.mp3", "MAKE": "make.mp3", "MY": "my.mp3", "DAY": "day.mp3", "CUSTOMER": "customer.mp3", "IS": "is.mp3", "ALWAYS": "always.mp3", "RIGHT": "right.mp3", "ALL": "all.mp3", "GOOD": "good.mp3", "THINGS": "things.mp3", "END": "end.mp3", "HONESTY": "honesty.mp3", "BEST": "best.mp3", "POLICY": "policy.mp3", "EVERY": "every.mp3", "DOG": "dog.mp3", "HAS": "has.mp3", "ITS": "its.mp3", "ROSE": "rose.mp3", "THORN": "thorn.mp3", "DIARY": "diary.mp3", "OF": "of.mp3", "A": "a.mp3", "WIMPY": "wimpy.mp3", "KID": "kid.mp3", "SNOW": "snow.mp3", "WHITE": "white.mp3", "AND THE": "and-the.mp3", "SEVEN": "seven.mp3", "DWARVES": "dwarves.mp3", "WALT": "walt.mp3", "DISNEY": "disney.mp3", "WORLD": "world.mp3", "ORLANDO": "orlando.mp3", "FLORIDA": "florida.mp3", "FOLLOW": "follow.mp3", "YELLOW": "yellow.mp3", "BRICK": "brick.mp3", "ROAD": "road.mp3", "SPIDER": "spider.mp3", "MAN": "man.mp3", "FAR": "far.mp3", "FROM": "from.mp3", "ALPHA": "alpha.mp3", "BRAVO": "bravo.mp3", "CHARLIE": "charlie.mp3", "DELTA": "delta.mp3", "ECHO": "echo.mp3", "MAY": "may.mp3", "THE FORCE": "the-force.mp3", "BE": "be.mp3", "WITH": "with.mp3", "YOU": "you.mp3", "CRY": "cry.mp3", "OVER": "over.mp3", "SPILLED": "spilled.mp3", "MILK": "milk.mp3", "ANOTHER": "another.mp3", "ONE": "one.mp3", "BITES": "bites.mp3", "DUST": "dust.mp3", "LIFE": "life.mp3", "A BOX": "a-box.mp3", "OF CHOCOLATES": "of-chocolates.mp3", "TIMES": "times.mp3", "ROLL": "roll.mp3", "SWEAT": "sweat.mp3", "SMALL": "small.mp3", "STUFF": "stuff.mp3", "ACTIONS": "actions.mp3", "SPEAK": "speak.mp3", "LOUDER": "louder.mp3", "THAN": "than.mp3", "WORDS": "words.mp3", "ROADS": "roads.mp3", "LEAD": "lead.mp3", "TO": "to.mp3", "ROME": "rome.mp3", "BALL": "ball.mp3", "IN YOUR": "in-your.mp3", "COURT": "court.mp3", "WATCHED": "watched.mp3", "POT": "pot.mp3", "NEVER": "never.mp3", "BOILS": "boils.mp3", "CLOUD": "cloud.mp3", "A SILVER": "a-silver.mp3", "LINING": "lining.mp3", "BIRDS": "birds.mp3", "OF A": "of-a.mp3", "FEATHER": "feather.mp3", "FLOCK": "flock.mp3", "TOGETHER": "together.mp3", "A ROLLING": "a-rolling.mp3", "STONE": "stone.mp3", "GATHERS": "gathers.mp3", "MOSS": "moss.mp3", "THE PROOF": "the-proof.mp3", "IN": "in.mp3", "PUDDING": "pudding.mp3"};
+const tileAudioFiles = {"WHO": "who.mp3", "LET": "let.mp3", "THE": "the.mp3", "DOGS": "dogs.mp3", "OUT": "out.mp3", "THERE'S": "there-s.mp3", "NO": "no.mp3", "PLACE": "place.mp3", "LIKE": "like.mp3", "HOME": "home.mp3", "LET'S": "let-s.mp3", "GET": "get.mp3", "THIS": "this.mp3", "PARTY": "party.mp3", "STARTED": "started.mp3", "KEEP": "keep.mp3", "CALM": "calm.mp3", "AND": "and.mp3", "CARRY": "carry.mp3", "ON": "on.mp3", "SHOW": "show.mp3", "MUST": "must.mp3", "GO": "go.mp3", "DON'T": "don-t.mp3", "TRY": "try.mp3", "AT": "at.mp3", "AHEAD": "ahead.mp3", "MAKE": "make.mp3", "MY": "my.mp3", "DAY": "day.mp3", "CUSTOMER": "customer.mp3", "IS": "is.mp3", "ALWAYS": "always.mp3", "RIGHT": "right.mp3", "ALL": "all.mp3", "GOOD": "good.mp3", "THINGS": "things.mp3", "END": "end.mp3", "HONESTY": "honesty.mp3", "BEST": "best.mp3", "POLICY": "policy.mp3", "EVERY": "every.mp3", "DOG": "dog.mp3", "HAS": "has.mp3", "ITS": "its.mp3", "ROSE": "rose.mp3", "THORN": "thorn.mp3", "DIARY": "diary.mp3", "OF": "of.mp3", "A": "a.mp3", "WIMPY": "wimpy.mp3", "KID": "kid.mp3", "SNOW": "snow.mp3", "WHITE": "white.mp3", "AND THE": "and-the.mp3", "SEVEN": "seven.mp3", "DWARFS": "dwarfs.mp3", "WALT": "walt.mp3", "DISNEY": "disney.mp3", "WORLD": "world.mp3", "ORLANDO": "orlando.mp3", "FLORIDA": "florida.mp3", "FOLLOW": "follow.mp3", "YELLOW": "yellow.mp3", "BRICK": "brick.mp3", "ROAD": "road.mp3", "SPIDER": "spider.mp3", "MAN": "man.mp3", "FAR": "far.mp3", "FROM": "from.mp3", "ALPHA": "alpha.mp3", "BRAVO": "bravo.mp3", "CHARLIE": "charlie.mp3", "DELTA": "delta.mp3", "ECHO": "echo.mp3", "MAY": "may.mp3", "THE FORCE": "the-force.mp3", "BE": "be.mp3", "WITH": "with.mp3", "YOU": "you.mp3", "CRY": "cry.mp3", "OVER": "over.mp3", "SPILLED": "spilled.mp3", "MILK": "milk.mp3", "ANOTHER": "another.mp3", "ONE": "one.mp3", "BITES": "bites.mp3", "DUST": "dust.mp3", "LIFE": "life.mp3", "A BOX": "a-box.mp3", "OF CHOCOLATES": "of-chocolates.mp3", "TIMES": "times.mp3", "ROLL": "roll.mp3", "SWEAT": "sweat.mp3", "SMALL": "small.mp3", "STUFF": "stuff.mp3", "ACTIONS": "actions.mp3", "SPEAK": "speak.mp3", "LOUDER": "louder.mp3", "THAN": "than.mp3", "WORDS": "words.mp3", "ROADS": "roads.mp3", "LEAD": "lead.mp3", "TO": "to.mp3", "ROME": "rome.mp3", "BALL": "ball.mp3", "IN YOUR": "in-your.mp3", "COURT": "court.mp3", "WATCHED": "watched.mp3", "POT": "pot.mp3", "NEVER": "never.mp3", "BOILS": "boils.mp3", "CLOUD": "cloud.mp3", "A SILVER": "a-silver.mp3", "LINING": "lining.mp3", "BIRDS": "birds.mp3", "OF A": "of-a.mp3", "FEATHER": "feather.mp3", "FLOCK": "flock.mp3", "TOGETHER": "together.mp3", "A ROLLING": "a-rolling.mp3", "STONE": "stone.mp3", "GATHERS": "gathers.mp3", "MOSS": "moss.mp3", "THE PROOF": "the-proof.mp3", "IN": "in.mp3", "PUDDING": "pudding.mp3"};
 const TILE_AUDIO_GAP_SECONDS = 0.20;
 const tileAudioCache = new Map();
 let tileAudioContext = null, activeTileSources = [], playbackSerial = 0;
@@ -830,7 +833,6 @@ function checkAttempt(){
    }
    setNextPuzzleLabel();
    $("#next").classList.remove("hidden");
-   if(gameMode==="practice")$("#switchReal").style.display="block";
    render();
  }else{
    submitting=false;
@@ -844,7 +846,7 @@ function animateFailedSolution(){
  const q=puzzles[p];
  const current=dragOrder.slice();
  const blocks=[...document.querySelectorAll("#boxes .wordbox")];
- if(blocks.length!==5){dragOrder=q.answer.slice();render();setNextPuzzleLabel();$("#next").classList.remove("hidden");if(gameMode==="practice")$("#switchReal").style.display="block";return;}
+ if(blocks.length!==5){dragOrder=q.answer.slice();render();setNextPuzzleLabel();$("#next").classList.remove("hidden");return;}
 
  // The words are already revealed in their CURRENT positions. Slowly slide each
  // entire block to the slot where that hidden chunk belongs in the solution.
@@ -862,7 +864,6 @@ function animateFailedSolution(){
    render();
    setNextPuzzleLabel();
    $("#next").classList.remove("hidden");
-   if(gameMode==="practice")$("#switchReal").style.display="block";
  },1900);
 }
 function pauseTimer(){
@@ -938,7 +939,7 @@ function load(){
  $("#next").classList.remove("hidden");
  setNextPuzzleLabel();
  $("#next").disabled=false;
- $("#switchReal").style.display="none";
+ 
  $("#backInstructions").style.display=gameMode==="practice"?"block":"none";
  $("#modeIndicator").textContent=gameMode==="practice"?"PRACTICE MODE — NO REAL MONEY":"REAL MONEY MODE";
  $("#modeIndicator").className="mode-indicator "+(gameMode==="practice"?"practice-mode":"real-mode");
@@ -1078,7 +1079,7 @@ async function startMode(mode, showRealIntro=false){
 }
 $("#practiceMode").onclick=()=>startMode("practice");
 $("#realMode").onclick=openRealLogin;
-$("#switchReal").onclick=openRealLogin;
+
 $("#backInstructions").onclick=()=>{
  if(gameMode!=="practice")return;
  stopTileAudio();
@@ -1086,7 +1087,7 @@ $("#backInstructions").onclick=()=>{
  stopTimer();
  gameMode=null;
  $("#backInstructions").style.display="none";
- $("#switchReal").style.display="none";
+ 
  $("#tutorial").style.display="flex";
 };
 </script></body></html>
