@@ -228,9 +228,6 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 #next small{display:block;font-size:12px;line-height:1.1;font-weight:600;letter-spacing:.02em;text-transform:none}
 #next span{display:block;font-size:20px;line-height:1.3;font-weight:900}
 #backInstructions{width:min(360px,82%);min-height:50px;margin:10px auto 0;border:0;border-radius:14px;background:#475569;color:white;font-size:17px;font-weight:800;cursor:pointer}
- .audio-spacing-control{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px auto 15px;font-size:15px;font-weight:800;color:#475569}
-.audio-spacing-control button{border:1px solid #94a3b8;background:white;color:#17221c;border-radius:9px;width:38px;height:34px;font-size:24px;line-height:1;cursor:pointer}
-.audio-spacing-control output{min-width:60px;text-align:center;font-variant-numeric:tabular-nums}
 </style><style>
 /* Five abutting squares spanning the full game row */
 #boxes{
@@ -378,13 +375,11 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
    <p>The words make a familiar phrase — <strong>but they start out jumbled!</strong></p>
    <p><strong>Drag the colored boxes left or right</strong> until you think the words are in the correct order. Press <strong>SUBMIT</strong> again to hear your new arrangement. You can keep rearranging the boxes and trying again.</p>
    <p>There is no time limit for an individual phrase. Use <strong>QUIT THIS PUZZLE</strong> to reveal and hear the correct order. The answer stays visible until you click <strong>NEXT PUZZLE</strong>.</p>
-   <p><strong>IMPORTANT:</strong> You can enter Real Money Mode only once. Starting it uses your one opportunity, even if you leave the game early. Make sure you have <strong>30 uninterrupted minutes</strong> available before you begin.</p>
-   <p>Practice Mode contains <strong>12 puzzles</strong> that you can replay as often as you like.</p>
    <p>In Real Money Mode, you have <strong>30 minutes total</strong> to solve as many phrases as possible. Each correct phrase earns <strong>$2.50</strong>. Real Money Mode ends at <strong>$50.00</strong>, <strong>20 puzzles</strong>, or <strong>30 minutes</strong>, whichever comes first.</p>
   </div>
   <div class="mode-choices">
-   <button id="practiceMode" type="button" class="mode-btn practice-btn">PRACTICE MODE<small>12 practice puzzles, replayable as often as you like. No money is won or lost.</small></button>
-   <button id="realMode" type="button" class="mode-btn real-btn">PLAY FOR REAL MONEY<small>One chance only. Set aside 30 uninterrupted minutes before starting!</small></button>
+   <button id="practiceMode" type="button" class="mode-btn practice-btn">PRACTICE MODE<small>Try as many real puzzles as you want. No money is won or lost.</small></button>
+   <button id="realMode" type="button" class="mode-btn real-btn">PLAY FOR REAL MONEY<small>Start the Birthday Challenge and play for actual birthday money!</small></button>
   </div>
  </div>
 </div>
@@ -403,16 +398,12 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 <div id="phase" class="phase">LISTENING ROUND</div>
 <div id="sessionTimer" class="timer hidden" style="color:#16803b">REAL MONEY TIME LEFT: 30:00</div>
 
-<div id="instruction" class="instruction" style="display:none"></div>
+<div id="instruction" class="instruction">Drag the mystery squares into phrase order. The words will NOT appear on the screen.</div>
 <div id="boxes" class="boxes"></div>
-<div id="audioSpacingControl" class="audio-spacing-control" aria-label="Adjust pause between spoken tiles">
- <span>Audio pause</span>
- <button id="spacingDown" type="button" aria-label="Shorter audio pause">−</button>
- <output id="audioSpacingValue">200 ms</output>
- <button id="spacingUp" type="button" aria-label="Longer audio pause">+</button>
+
+<div id="answerArea" class="hidden">
+ <div class="label">ORDER THE SQUARES TO FORM A PHRASE</div>
 </div>
-
-
 
 <div class="fixed-control-area">
  <div class="fixed-button-slot">
@@ -420,10 +411,10 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
   <button id="next" class="hidden"><small>quit this puzzle</small><span>NEXT PUZZLE</span></button>
  </div>
  <div id="feedback" class="feedback fixed-message-slot"></div>
- <button id="backInstructions" type="button" style="display:none">ENTER REAL MONEY MODE</button>
+ <button id="backInstructions" type="button" style="display:none">RETURN TO INSTRUCTIONS</button>
  <button id="switchReal">PLAY FOR REAL MONEY</button>
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.3 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.2 — 2026-10-23</div>
 </div></div>
 
 <script>
@@ -696,7 +687,7 @@ function startOrder(){
  timeLeft=60;
  updateTimer();
  $("#phase").textContent="PUT THE PHRASE IN ORDER";
- $("#instruction").textContent="";
+ $("#instruction").textContent="Drag the squares into the correct order. Use NEXT PUZZLE to reveal and skip this phrase.";
  $("#answerArea").classList.remove("hidden");
  $("#submit").classList.remove("hidden");
  $("#submit").disabled=false;
@@ -717,19 +708,7 @@ function flickerPlaybackSquare(identity){
 // Prerecorded audio, trimmed to remove excess silence.
 // Web Audio schedules the next tile 200 ms after the previous clip ends.
 const tileAudioFiles = {"WHO": "who.mp3", "LET": "let.mp3", "THE": "the.mp3", "DOGS": "dogs.mp3", "OUT": "out.mp3", "THERE'S": "there-s.mp3", "NO": "no.mp3", "PLACE": "place.mp3", "LIKE": "like.mp3", "HOME": "home.mp3", "LET'S": "let-s.mp3", "GET": "get.mp3", "THIS": "this.mp3", "PARTY": "party.mp3", "STARTED": "started.mp3", "KEEP": "keep.mp3", "CALM": "calm.mp3", "AND": "and.mp3", "CARRY": "carry.mp3", "ON": "on.mp3", "SHOW": "show.mp3", "MUST": "must.mp3", "GO": "go.mp3", "DON'T": "don-t.mp3", "TRY": "try.mp3", "AT": "at.mp3", "AHEAD": "ahead.mp3", "MAKE": "make.mp3", "MY": "my.mp3", "DAY": "day.mp3", "CUSTOMER": "customer.mp3", "IS": "is.mp3", "ALWAYS": "always.mp3", "RIGHT": "right.mp3", "ALL": "all.mp3", "GOOD": "good.mp3", "THINGS": "things.mp3", "END": "end.mp3", "HONESTY": "honesty.mp3", "BEST": "best.mp3", "POLICY": "policy.mp3", "EVERY": "every.mp3", "DOG": "dog.mp3", "HAS": "has.mp3", "ITS": "its.mp3", "ROSE": "rose.mp3", "THORN": "thorn.mp3", "DIARY": "diary.mp3", "OF": "of.mp3", "A": "a.mp3", "WIMPY": "wimpy.mp3", "KID": "kid.mp3", "SNOW": "snow.mp3", "WHITE": "white.mp3", "AND THE": "and-the.mp3", "SEVEN": "seven.mp3", "DWARVES": "dwarves.mp3", "WALT": "walt.mp3", "DISNEY": "disney.mp3", "WORLD": "world.mp3", "ORLANDO": "orlando.mp3", "FLORIDA": "florida.mp3", "FOLLOW": "follow.mp3", "YELLOW": "yellow.mp3", "BRICK": "brick.mp3", "ROAD": "road.mp3", "SPIDER": "spider.mp3", "MAN": "man.mp3", "FAR": "far.mp3", "FROM": "from.mp3", "ALPHA": "alpha.mp3", "BRAVO": "bravo.mp3", "CHARLIE": "charlie.mp3", "DELTA": "delta.mp3", "ECHO": "echo.mp3", "MAY": "may.mp3", "THE FORCE": "the-force.mp3", "BE": "be.mp3", "WITH": "with.mp3", "YOU": "you.mp3", "CRY": "cry.mp3", "OVER": "over.mp3", "SPILLED": "spilled.mp3", "MILK": "milk.mp3", "ANOTHER": "another.mp3", "ONE": "one.mp3", "BITES": "bites.mp3", "DUST": "dust.mp3", "LIFE": "life.mp3", "A BOX": "a-box.mp3", "OF CHOCOLATES": "of-chocolates.mp3", "TIMES": "times.mp3", "ROLL": "roll.mp3", "SWEAT": "sweat.mp3", "SMALL": "small.mp3", "STUFF": "stuff.mp3", "ACTIONS": "actions.mp3", "SPEAK": "speak.mp3", "LOUDER": "louder.mp3", "THAN": "than.mp3", "WORDS": "words.mp3", "ROADS": "roads.mp3", "LEAD": "lead.mp3", "TO": "to.mp3", "ROME": "rome.mp3", "BALL": "ball.mp3", "IN YOUR": "in-your.mp3", "COURT": "court.mp3", "WATCHED": "watched.mp3", "POT": "pot.mp3", "NEVER": "never.mp3", "BOILS": "boils.mp3", "CLOUD": "cloud.mp3", "A SILVER": "a-silver.mp3", "LINING": "lining.mp3", "BIRDS": "birds.mp3", "OF A": "of-a.mp3", "FEATHER": "feather.mp3", "FLOCK": "flock.mp3", "TOGETHER": "together.mp3", "A ROLLING": "a-rolling.mp3", "STONE": "stone.mp3", "GATHERS": "gathers.mp3", "MOSS": "moss.mp3", "THE PROOF": "the-proof.mp3", "IN": "in.mp3", "PUDDING": "pudding.mp3"};
-let tileAudioGapSeconds = 0.20;
-const TILE_AUDIO_GAP_MIN = 0.10;
-const TILE_AUDIO_GAP_MAX = 0.60;
-const TILE_AUDIO_GAP_STEP = 0.05;
-function updateAudioSpacingLabel(){
-  const label=document.getElementById('audioSpacingValue');
-  if(label)label.textContent=Math.round(tileAudioGapSeconds*1000)+' ms';
-}
-function adjustAudioSpacing(direction){
-  const ms=Math.round(tileAudioGapSeconds*1000)+direction*Math.round(TILE_AUDIO_GAP_STEP*1000);
-  tileAudioGapSeconds=Math.min(TILE_AUDIO_GAP_MAX,Math.max(TILE_AUDIO_GAP_MIN,ms/1000));
-  updateAudioSpacingLabel();
-}
+const TILE_AUDIO_GAP_SECONDS = 0.20;
 const tileAudioCache = new Map();
 let tileAudioContext = null, activeTileSources = [], playbackSerial = 0;
 function stopTileAudio(){
@@ -759,7 +738,7 @@ async function speakSubmittedOrder(done){
     await tileAudioContext.resume();
     const buffers=await Promise.all(chunks.map(loadTileBuffer));
     if(serial!==playbackSerial)return;
-    let when=tileAudioContext.currentTime+tileAudioGapSeconds;
+    let when=tileAudioContext.currentTime+0.10;
     let remaining=buffers.length;
     buffers.forEach((buffer,index)=>{
       const src=tileAudioContext.createBufferSource();
@@ -777,7 +756,7 @@ async function speakSubmittedOrder(done){
       activeTileSources.push(src);
       const delay=Math.max(0,(when-tileAudioContext.currentTime)*1000);
       setTimeout(()=>{if(serial===playbackSerial)flickerPlaybackSquare(identities[index]);},delay);
-      when+=buffer.duration+tileAudioGapSeconds;
+      when+=buffer.duration+TILE_AUDIO_GAP_SECONDS;
     });
   }catch(err){
     console.error('Recorded audio failed:',err);
@@ -814,7 +793,7 @@ function submitAnswer(){
      if(phase!=="order")return;
      submitting=false;
      $("#feedback").className="feedback";
-     $("#feedback").textContent="";
+     $("#feedback").textContent="REARRANGE THE BOXES TO FORM THE CORRECT PHRASE AND CLICK THE SUBMIT BUTTON.";
      $("#submit").disabled=false;
      
      render();
@@ -1101,9 +1080,11 @@ $("#switchReal").onclick=openRealLogin;
 $("#backInstructions").onclick=()=>{
  if(gameMode!=="practice")return;
  stopTileAudio();
- openRealLogin();
+  if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ stopTimer();
+ gameMode=null;
+ $("#backInstructions").style.display="none";
+ $("#switchReal").style.display="none";
+ $("#tutorial").style.display="flex";
 };
-$("#spacingDown").onclick=()=>adjustAudioSpacing(-1);
-$("#spacingUp").onclick=()=>adjustAudioSpacing(1);
-updateAudioSpacingLabel();
 </script></body></html>
