@@ -419,7 +419,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.10 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.11 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -727,8 +727,9 @@ async function loadTileBuffer(tile){
     const filename=tileAudioFiles[tile];
     if(!filename)throw new Error('Missing audio tile '+tile);
     const promise=fetch('audio/'+encodeURIComponent(filename))
-      .then(r=>{if(!r.ok)throw new Error('Audio HTTP '+r.status);return r.arrayBuffer()})
-      .then(b=>tileAudioContext.decodeAudioData(b));
+      .then(r=>{if(!r.ok)throw new Error(filename+' HTTP '+r.status);return r.arrayBuffer()})
+      .then(b=>tileAudioContext.decodeAudioData(b))
+      .catch(err=>{tileAudioCache.delete(tile);throw new Error(filename+': '+err.message);});
     tileAudioCache.set(tile,promise);
   }
   return tileAudioCache.get(tile);
@@ -741,7 +742,10 @@ async function speakSubmittedOrder(done){
   try{
     if(!tileAudioContext)tileAudioContext=new (window.AudioContext||window.webkitAudioContext)();
     await tileAudioContext.resume();
-    const buffers=await Promise.all(chunks.map(loadTileBuffer));
+    const results=await Promise.allSettled(chunks.map(loadTileBuffer));
+    const failures=results.map((result,i)=>result.status==='rejected' ? chunks[i]+': '+result.reason.message : null).filter(Boolean);
+    if(failures.length)throw new Error('Cannot load '+failures.join('; '));
+    const buffers=results.map(result=>result.value);
     if(serial!==playbackSerial)return;
     let when=tileAudioContext.currentTime+TILE_AUDIO_GAP_SECONDS;
     let remaining=buffers.length;
@@ -766,13 +770,13 @@ async function speakSubmittedOrder(done){
   }catch(err){
     console.error('Recorded audio failed:',err);
     if(serial!==playbackSerial)return;
-    tileAudioCache.delete(chunks.find(c=>!tileAudioFiles[c])||chunks[0]);
+    // Failed audio requests are removed from the cache by loadTileBuffer.
     submitting=false;
     const msg='AUDIO ERROR: '+err.message+'. Check the MP3 files in GitHub, then try SUBMIT again.';
     $('#feedback').className='feedback bad';
     $('#feedback').textContent=msg;
     $('#submit').disabled=false;
-    if(done)done(new Error(msg));
+    // Keep the puzzle available for retry; do not evaluate an inaudible submission.
   }
 }
 
