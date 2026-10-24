@@ -419,7 +419,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.11 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.12 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -972,7 +972,7 @@ $('#next').onclick=()=>{
  dragOrder=puzzles[p].answer.slice();
  setNextPuzzleLabel();
  $('#feedback').className='feedback';
- $('#feedback').textContent='CORRECT ORDER — LISTEN TO THE PHRASE, THEN CLICK NEXT PUZZLE WHEN READY.';
+ $('#feedback').textContent='Playing puzzle words in correct order';
  $('#submit').classList.add('hidden');
  $('#next').disabled=false;
  render();
