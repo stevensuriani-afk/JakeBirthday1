@@ -407,9 +407,9 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
    <p>The words make a familiar phrase — <strong>but they start out jumbled!</strong></p>
    <p><strong>Drag the colored boxes left or right</strong> until you think the words are in the correct order. Press <strong>SUBMIT</strong> again to hear your new arrangement. You can keep rearranging the boxes and trying again.</p>
    <p>There is no time limit for an individual phrase. Use <strong>QUIT THIS PUZZLE</strong> to reveal and hear the correct order. The answer stays visible until you click <strong>NEXT PUZZLE</strong>.</p>
-   <p><strong>IMPORTANT:</strong> You can enter Real Money Mode only once. Starting it uses your one opportunity, even if you leave the game early. Make sure you have <strong>30 uninterrupted minutes</strong> available before you begin.</p>
+   <p><strong>IMPORTANT:</strong> You can enter Real Money Mode only once. Starting it uses your one opportunity, even if you leave the game early. Make sure you have <strong>20 uninterrupted minutes</strong> available before you begin.</p>
     <p>Practice Mode contains <strong>12 puzzles</strong> that you can replay as often as you like.</p>
-    <p>In Real Money Mode, you have <strong>30 minutes total</strong> to solve as many phrases as possible. Each correct phrase earns <strong>$2.50</strong>. Real Money Mode ends at <strong>$50</strong>, <strong>20 puzzles</strong>, or <strong>30 minutes</strong>, whichever comes first.</p>
+    <p>In Real Money Mode, you have <strong>20 minutes total</strong> to solve as many phrases as possible. Each correct phrase earns <strong>$2.50</strong>. Real Money Mode ends at <strong>$50</strong>, <strong>20 puzzles</strong>, or <strong>20 minutes</strong>, whichever comes first.</p>
   </div>
   <div class="mode-choices">
    <button id="practiceMode" type="button" class="mode-btn practice-btn">PRACTICE MODE</button>
@@ -430,7 +430,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
 </div>
 
 <div id="phase" class="phase" aria-live="polite">LISTENING ROUND</div>
-<div id="sessionTimer" class="timer hidden" style="color:#16803b">REAL MONEY TIME LEFT: 30:00</div>
+<div id="sessionTimer" class="timer hidden" style="color:#16803b">REAL MONEY TIME LEFT: 20:00</div>
 
 
 <div id="boxes" class="boxes"></div>
@@ -452,7 +452,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.24 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.26 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -496,7 +496,7 @@ let dragOrder=[0,1,2,3,4],submitting=false,timerStarted=false;
 // gap that will receive the dragged square on release.
 let activeDragIdentity=null,pendingDropPos=null;
 let timeLeft=60,timerId=null;
-const REAL_SESSION_SECONDS=30*60;
+const REAL_SESSION_SECONDS=20*60;
 let realSessionRemaining=REAL_SESSION_SECONDS,realSessionInterval=null,realSessionEnded=false;
 function updateRealSessionDisplay(){
  const el=document.querySelector('#sessionTimer');
@@ -583,7 +583,7 @@ function playJakeBirthdaySong(){
 }
 function showJakeFinalScreen(reason){
  const reasons={
-  '30 MINUTES COMPLETE':'Time is up — the 30-minute limit has been reached.',
+  '20 MINUTES COMPLETE':'Time is up — the 20-minute limit has been reached.',
   '$50 BANK LIMIT REACHED':'You reached the $50 maximum!',
   '20 PUZZLES COMPLETE':'All 20 puzzles have been completed!',
   'PLAYER CASHED OUT':'You chose to cash out early.'
@@ -596,7 +596,7 @@ function showJakeFinalScreen(reason){
 }
 
 
-function endRealSession(reason="30 MINUTES COMPLETE"){
+function endRealSession(reason="20 MINUTES COMPLETE"){
  if(realSessionEnded)return;
  realSessionEnded=true;
  if(gameMode==='real')void saveSayWhatResult(reason);
@@ -888,7 +888,9 @@ let activeTileAudio = null, playbackSerial = 0, tilePauseTimer = null;
 let preparedTileAudio = [];
 function stopTileAudio(){
   playbackSerial++;
-  if(tileBufferSource){try{tileBufferSource.stop();}catch(e){} tileBufferSource=null;}
+  for(const source of scheduledTileSources){try{source.stop();}catch(e){}}
+  scheduledTileSources=[];
+  tileBufferSource=null;
   if(tilePauseTimer!==null){clearTimeout(tilePauseTimer);tilePauseTimer=null;}
   // Cancel only on an explicit interruption, not between consecutive words.
   for(const audio of preparedTileAudio){
@@ -931,6 +933,7 @@ function prepareTileAudio(filename,serial){
 // This avoids HTMLMediaElement end-of-stream truncation without changing MP3 files.
 let tileAudioContext=null;
 let tileBufferSource=null;
+let scheduledTileSources=[];
 async function preparePaddedTileBuffer(filename,serial){
   if(!tileAudioContext)tileAudioContext=new (window.AudioContext||window.webkitAudioContext)();
   const url='audio/'+encodeURIComponent(filename)+'?audio_revision=20261025a';
@@ -967,20 +970,43 @@ async function speakSubmittedOrder(done){
     const buffers=await Promise.all(filenames.map(filename=>preparePaddedTileBuffer(filename,serial)));
     if(serial!==playbackSerial)return;
     await tileAudioContext.resume();
+    // Schedule the words against the audio clock. The 0.15-second protective
+    // tail remains in each buffer, but it does NOT add to the chosen pause.
+    // Detect long near-silent MP3 tails conservatively so they don't make
+    // the fastest setting feel slow; retain 65 ms after the last audible sample.
+    let startAt=tileAudioContext.currentTime+0.025;
+    const scheduled=[];
     for(let i=0;i<buffers.length;i++){
-      if(!await waitTilePause(serial))return;
-      if(serial!==playbackSerial)return;
-      flickerPlaybackSquare(identities[i]);
-      await new Promise((resolve,reject)=>{
-        const source=tileAudioContext.createBufferSource();
-        tileBufferSource=source;
-        source.buffer=buffers[i];
-        source.connect(tileAudioContext.destination);
-        source.onended=()=>{if(tileBufferSource===source)tileBufferSource=null;resolve();};
-        try{source.start();}catch(err){reject(err);}
-      });
-      if(serial!==playbackSerial)return;
+      const buffer=buffers[i];
+      const source=tileAudioContext.createBufferSource();
+      source.buffer=buffer;
+      source.connect(tileAudioContext.destination);
+      scheduledTileSources.push(source);
+      scheduled.push(source);
+      const frameCount=Math.max(0,buffer.length-Math.ceil(buffer.sampleRate*0.15));
+      const channels=Array.from({length:buffer.numberOfChannels},(_,ch)=>buffer.getChannelData(ch));
+      let lastAudible=frameCount-1;
+      const threshold=0.001; // -60 dB; protect quiet consonants
+      while(lastAudible>0){
+        let audible=false;
+        for(const data of channels){if(Math.abs(data[lastAudible])>threshold){audible=true;break;}}
+        if(audible)break;
+        lastAudible--;
+      }
+      const audibleEnd=Math.min(frameCount/buffer.sampleRate,(lastAudible+1)/buffer.sampleRate+0.065);
+      const durationToNext=Math.max(0.08,audibleEnd);
+      const scheduledTime=startAt;
+      source.start(scheduledTime);
+      const flickerDelay=Math.max(0,(scheduledTime-tileAudioContext.currentTime)*1000);
+      setTimeout(()=>{if(serial===playbackSerial)flickerPlaybackSquare(identities[i]);},flickerDelay);
+      startAt+=durationToNext+tileAudioGapMs/1000;
     }
+    // Keep all sources alive until the last recording (including its padded
+    // tail) completes; never stop a source just because the next one begins.
+    await new Promise(resolve=>{scheduled[scheduled.length-1].onended=resolve;});
+    if(serial!==playbackSerial)return;
+    scheduledTileSources=scheduledTileSources.filter(src=>!scheduled.includes(src));
+    tileBufferSource=null;
     if(serial===playbackSerial && done)done();
   }catch(err){
     console.error('Recorded audio failed:',err);
