@@ -452,7 +452,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.23 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.24 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -888,6 +888,7 @@ let activeTileAudio = null, playbackSerial = 0, tilePauseTimer = null;
 let preparedTileAudio = [];
 function stopTileAudio(){
   playbackSerial++;
+  if(tileBufferSource){try{tileBufferSource.stop();}catch(e){} tileBufferSource=null;}
   if(tilePauseTimer!==null){clearTimeout(tilePauseTimer);tilePauseTimer=null;}
   // Cancel only on an explicit interruption, not between consecutive words.
   for(const audio of preparedTileAudio){
@@ -926,6 +927,31 @@ function prepareTileAudio(filename,serial){
     audio.load();
   });
 }
+// Decode each MP3 into PCM and append a short silent tail in memory.
+// This avoids HTMLMediaElement end-of-stream truncation without changing MP3 files.
+let tileAudioContext=null;
+let tileBufferSource=null;
+async function preparePaddedTileBuffer(filename,serial){
+  if(!tileAudioContext)tileAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+  const url='audio/'+encodeURIComponent(filename)+'?audio_revision=20261025a';
+  const response=await fetch(url);
+  if(!response.ok)throw new Error(filename+' could not be loaded');
+  const raw=await response.arrayBuffer();
+  const decoded=await tileAudioContext.decodeAudioData(raw);
+  if(serial!==playbackSerial)return null;
+  const extraFrames=Math.ceil(tileAudioContext.sampleRate*0.15);
+  const padded=tileAudioContext.createBuffer(decoded.numberOfChannels,Math.ceil(decoded.duration*tileAudioContext.sampleRate)+extraFrames,tileAudioContext.sampleRate);
+  for(let ch=0;ch<decoded.numberOfChannels;ch++){
+    const source=decoded.getChannelData(ch),dest=padded.getChannelData(ch);
+    if(decoded.sampleRate===tileAudioContext.sampleRate){dest.set(source);}
+    else {for(let i=0;i<dest.length-extraFrames;i++){
+      const pos=i*decoded.sampleRate/tileAudioContext.sampleRate;
+      const a=Math.floor(pos),b=Math.min(a+1,source.length-1),t=pos-a;
+      dest[i]=a<source.length?source[a]*(1-t)+source[b]*t:0;
+    }}
+  }
+  return padded;
+}
 async function speakSubmittedOrder(done){
   stopTileAudio();
   const serial=playbackSerial;
@@ -937,23 +963,23 @@ async function speakSubmittedOrder(done){
       if(!filename)throw new Error('Missing audio tile '+chunk);
       return filename;
     });
-    // Prepare every recording before playback, and retain all five audio
-    // elements until the complete sequence has finished.
-    const audios=await Promise.all(filenames.map(filename=>prepareTileAudio(filename,serial)));
+    // Fully decode all recordings before starting; retain buffers for the sequence.
+    const buffers=await Promise.all(filenames.map(filename=>preparePaddedTileBuffer(filename,serial)));
     if(serial!==playbackSerial)return;
-    for(let i=0;i<audios.length;i++){
+    await tileAudioContext.resume();
+    for(let i=0;i<buffers.length;i++){
       if(!await waitTilePause(serial))return;
       if(serial!==playbackSerial)return;
-      const audio=audios[i];
-      activeTileAudio=audio;
       flickerPlaybackSquare(identities[i]);
       await new Promise((resolve,reject)=>{
-        audio.onended=()=>resolve();
-        audio.onerror=()=>reject(new Error(filenames[i]+' could not be played'));
-        audio.play().catch(reject);
+        const source=tileAudioContext.createBufferSource();
+        tileBufferSource=source;
+        source.buffer=buffers[i];
+        source.connect(tileAudioContext.destination);
+        source.onended=()=>{if(tileBufferSource===source)tileBufferSource=null;resolve();};
+        try{source.start();}catch(err){reject(err);}
       });
       if(serial!==playbackSerial)return;
-      activeTileAudio=null;
     }
     if(serial===playbackSerial && done)done();
   }catch(err){
