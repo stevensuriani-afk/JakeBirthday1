@@ -452,7 +452,7 @@ button.alt{background:#fff;color:#123d2c;border:2px solid #123d2c}.feedback{min-
  <button id="backInstructions" type="button" style="display:none"><small>return to instructions</small><span>PLAY FOR REAL MONEY</span></button>
  
 </div>
-<div class="mock" id="gameVersion">Game version: 1.1.27 — 2026-10-24</div>
+<div class="mock" id="gameVersion">Game version: 1.1.28 — 2026-10-24</div>
 </div></div>
 
 <script>
@@ -1157,9 +1157,9 @@ function chooseChallengingTileOrder(){
      // Reject circular rotations (e.g. 5-1-2-3-4 or 2-3-4-5-1),
      // even though the long-run rule already normally excludes them.
      const circularRotation=prefix.every((tile,i)=>tile===(prefix[0]+i)%5);
-     // Require at least three displaced tiles, no long ascending runs,
+     // Require ALL five tiles to be displaced, no long ascending runs,
      // and never present a simple rotation of the solution.
-     if(correctPositions<=2 && longestRun<=2 && !circularRotation)candidates.push(prefix);
+     if(correctPositions===0 && longestRun<=2 && !circularRotation)candidates.push(prefix);
      return;
    }
    remaining.forEach((tile,i)=>visit([...prefix,tile],remaining.filter((_,j)=>i!==j)));
@@ -1179,7 +1179,7 @@ function load(){
  if("speechSynthesis" in window) window.speechSynthesis.cancel();
  heardOrder=[];choice=[];submitting=false;timerStarted=false;phase="order";
  // Choose uniformly from challenging permutations, rather than allowing
- // easy circular shifts or long already-correct runs.
+ // easy circular shifts, correctly positioned tiles, or long ascending runs.
  dragOrder=chooseChallengingTileOrder();
  firstRealSubmission=true;
  timeLeft=60;updateTimer();
